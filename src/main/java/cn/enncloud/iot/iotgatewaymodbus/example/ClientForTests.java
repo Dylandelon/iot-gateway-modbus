@@ -23,7 +23,7 @@ public class ClientForTests {
 
         modbusClient = new ModbusClient("10.4.95.71" /*
          * "192.168.1.55"
-         */, 10502);
+         */, 80);
 
         //30502
 
