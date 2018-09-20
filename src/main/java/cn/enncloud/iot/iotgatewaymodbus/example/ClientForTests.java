@@ -16,9 +16,16 @@ public class ClientForTests {
     private final ModbusClient modbusClient;
 
     private ClientForTests() {
-        modbusClient = new ModbusClient("localhost" /*
-                 * "192.168.1.55"
-                 */, 30502); //ModbusConstants.MODBUS_DEFAULT_PORT);
+//        modbusClient = new ModbusClient("localhost" /*
+//                 * "192.168.1.55"
+//                 */, 30502); //ModbusConstants.MODBUS_DEFAULT_PORT);
+
+
+        modbusClient = new ModbusClient("10.4.95.71" /*
+         * "192.168.1.55"
+         */, 10502);
+
+        //30502
 
         try {
             modbusClient.setup();

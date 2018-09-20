@@ -33,11 +33,11 @@ import static org.junit.Assert.assertNotNull;
 public class ModbusWriteMultipleRegistersTest {
 
     ModbusClient modbusClient;
-    ModbusServer modbusServer;
+//    ModbusServer modbusServer;
 
     @Before
     public void setUp() throws Exception {
-        modbusServer = ServerForTests.getInstance().getModbusServer();
+//        modbusServer = ServerForTests.getInstance().getModbusServer();
         modbusClient = ClientForTests.getInstance().getModbusClient();
     }
 
