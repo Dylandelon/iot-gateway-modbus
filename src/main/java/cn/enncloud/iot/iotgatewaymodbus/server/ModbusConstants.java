@@ -11,7 +11,8 @@ public class ModbusConstants {
     public static final int SYNC_RESPONSE_TIMEOUT = 2000; //milliseconds
     public static final int TRANSACTION_IDENTIFIER_MAX = 100; //affects memory usage of library
 
-    public static final int ADU_MAX_LENGTH = 260;
+//    public static final int ADU_MAX_LENGTH = 260;
+    public static final int ADU_MAX_LENGTH = 0x7fffffff;
     public static final int MBAP_LENGTH = 7;
 
     public static final int DEFAULT_MODBUS_PORT = 502;

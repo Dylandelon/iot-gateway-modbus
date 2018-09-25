@@ -41,7 +41,7 @@ public class ModbusChannelInitializer extends ChannelInitializer<SocketChannel> 
          * | (2 Byte)               | (2 Byte)            | (2 Byte) | (1 Byte)        || (1 Byte)      | (1 - 252 Byte |
          * +------------------------+---------------------+----------+-----------------++---------------+---------------+
          */
-        pipeline.addLast("framer", new LengthFieldBasedFrameDecoder(ModbusConstants.ADU_MAX_LENGTH, 4, 2));
+//        pipeline.addLast("framer", new LengthFieldBasedFrameDecoder(ModbusConstants.ADU_MAX_LENGTH, 4, 2));
 
         //Modbus encoder, decoder
         pipeline.addLast("encoder", new ModbusEncoder());

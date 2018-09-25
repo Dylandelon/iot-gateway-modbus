@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 //@FeignClient(name = "iot-service-meta-manager-v1", fallback = DmsGatewayServiceImpl.class)
-@FeignClient(url = "http://127.0.0.1:8240",name = "aaa",fallback = DmsGatewayServiceImpl.class)
+@FeignClient(url = "http://10.4.93.6:8240",name = "aaa",fallback = DmsGatewayServiceImpl.class)
 public interface DmsGatewayService {
 
     /**

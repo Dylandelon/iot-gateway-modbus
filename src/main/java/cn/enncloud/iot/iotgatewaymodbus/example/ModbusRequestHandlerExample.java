@@ -7,6 +7,7 @@ import cn.enncloud.iot.iotgatewaymodbus.entity.func.WriteSingleRegister;
 import cn.enncloud.iot.iotgatewaymodbus.entity.func.request.*;
 import cn.enncloud.iot.iotgatewaymodbus.entity.func.response.*;
 import cn.enncloud.iot.iotgatewaymodbus.handler.ModbusRequestHandler;
+import io.netty.channel.ChannelHandler;
 
 import java.util.BitSet;
 
@@ -14,6 +15,7 @@ import java.util.BitSet;
  *
  * @author ares
  */
+@ChannelHandler.Sharable
 public class ModbusRequestHandlerExample extends ModbusRequestHandler {
 
     @Override

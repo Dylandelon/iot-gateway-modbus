@@ -121,7 +121,7 @@ public class CommandController {
 //        log.info(writeMultipleRegisters);
 
 //        byte[] bytesWrite2 = TCPServerNetty.hexToByteArray("010300000001840A");
-        ChannelHandlerContext  channel = TCPServerNetty.getMap().get("10.4.95.71");
+        ChannelHandlerContext  channel = TCPServerNetty.getMap().get("10.39.10.171");
 //        ByteBuf buf = ChannelHandlerContext.alloc().buffer(bytesWrite2.length);
 
 
