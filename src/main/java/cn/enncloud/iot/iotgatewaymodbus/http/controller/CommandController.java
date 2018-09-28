@@ -14,6 +14,7 @@ import cn.enncloud.iot.iotgatewaymodbus.http.response.DataRespBody;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.GatewayApiService;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.ModbusPointInfo;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.PointDTO;
+import cn.enncloud.iot.iotgatewaymodbus.http.tools.Tool;
 import cn.enncloud.iot.iotgatewaymodbus.http.tools.ValidatorTools;
 import cn.enncloud.iot.iotgatewaymodbus.http.vo.dto.DmsGateWayDevicControlVo;
 import cn.enncloud.iot.iotgatewaymodbus.server.ModbusClient;
@@ -82,46 +83,21 @@ public class CommandController {
 
 
 
-//        ModbusClient modbusClient = ClientForTests.getInstance().getModbusClient();
-//        boolean state = true;
-//        for (int i = 0; i < 20; i++) {
-//            WriteSingleCoil writeCoil = null;
-//            try {
-//                writeCoil = modbusClient.writeSingleCoil(modbusPointInfo.getRegisterAddr(), state);
-//            } catch (NoResponseException e) {
-//                e.printStackTrace();
-//            } catch (ErrorResponseException e) {
-//                e.printStackTrace();
-//            } catch (ConnectionException e) {
-//                e.printStackTrace();
-//            }
-//
-//
-//            log.info(writeCoil);
-//
-//            state = state ? false : true;
-//        }
-//        int quantityOfRegisters = 10;
-//
-//        int[] registers = new int[quantityOfRegisters];
-//        registers[0] = 0xFFFF;
-//        registers[1] = 0xF0F0;
-//        registers[2] = 0x0F0F;
-//
-//        WriteMultipleRegistersResponse writeMultipleRegisters = null;
-//        try {
-//            writeMultipleRegisters = modbusClient.writeMultipleRegisters(1, quantityOfRegisters, registers);
-//        } catch (NoResponseException e) {
-//            e.printStackTrace();
-//        } catch (ErrorResponseException e) {
-//            e.printStackTrace();
-//        } catch (ConnectionException e) {
-//            e.printStackTrace();
-//        }
-//        log.info(writeMultipleRegisters);
 
 //        byte[] bytesWrite2 = TCPServerNetty.hexToByteArray("010300000001840A");
-        ChannelHandlerContext  channel = TCPServerNetty.getMap().get("10.39.10.171");
+        TCPServerNetty.getMap().entrySet().forEach(ch->{
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("01060000").append(String.format("%04x", Integer.valueOf(entity.getValue())));
+
+
+            byte[] bytesWrite4 = TCPServerNetty.hexToByteArray(sb.toString());
+
+            log.info("向设备下发的信息为："+TCPServerNetty.bytesToHexString(CRC16.addCRC(bytesWrite4)));
+
+            ch.getValue().writeAndFlush(CRC16.addCRC(bytesWrite4));
+        });
+        ChannelHandlerContext  channel = TCPServerNetty.getMap().get("10.4.95.71");
 //        ByteBuf buf = ChannelHandlerContext.alloc().buffer(bytesWrite2.length);
 
 
@@ -165,7 +141,8 @@ public class CommandController {
         sb.append("01060000").append(String.format("%04x", Integer.valueOf(entity.getValue())));
 
 
-        byte[] bytesWrite4 = TCPServerNetty.hexToByteArray(sb.toString());
+        String cipherText = Tool.SC_Tea_Encryption_Str(sb.toString(),"2018091200000000");
+        byte[] bytesWrite4 = TCPServerNetty.hexToByteArray(cipherText);
 
         log.info("向设备下发的信息为："+TCPServerNetty.bytesToHexString(CRC16.addCRC(bytesWrite4)));
 

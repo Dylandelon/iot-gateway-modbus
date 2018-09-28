@@ -1,0 +1,13 @@
+spring:
+  cloud:
+    config:
+    # For profile-dev
+      enabled: false
+  config:
+    # For profile-dev
+    location: 'classpath:/iot-service-meta-manager-v1-dev.yml'
+enn:
+  logging:
+    kafka:
+      bootstrap-servers: 10.39.10.146:9092,10.39.10.147:9092,10.39.10.148:9092
+      topic: enn_logging_kafka_topic

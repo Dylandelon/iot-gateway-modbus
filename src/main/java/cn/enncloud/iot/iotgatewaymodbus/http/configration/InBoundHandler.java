@@ -1,5 +1,6 @@
 package cn.enncloud.iot.iotgatewaymodbus.http.configration;
 
+import cn.enncloud.iot.iotgatewaymodbus.http.tools.Tool;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -35,7 +36,13 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
     protected void channelRead0(ChannelHandlerContext ctx, byte[] msg)
             throws Exception {
         logger.info("来自设备的信息：" + TCPServerNetty.bytesToHexString(msg));
-        byte byteA3 = msg[1];
+        logger.info("来自设备的信息2：" + TCPServerNetty.bytesToHexStringCompact(msg));
+
+        String plainText=Tool.SC_Tea_Encryption_Str(TCPServerNetty.bytesToHexStringCompact(msg),"2018091200000000");
+        logger.info("来自设备的信息解密后：{}" ,plainText);
+        byte[] bytesTemp = TCPServerNetty.hexToByteArray(plainText);
+
+        byte byteA3 = bytesTemp[1];
 //        byte[] addressDomain = new byte[3];
 //        byte[] addressDomain = new byte[5];
 //        System.arraycopy(msg, 7, addressDomain, 0, 5);
@@ -45,15 +52,17 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
 
         if (byteA3 == 115) {
             byte[] addressDomain = new byte[5];
-            System.arraycopy(msg, 7, addressDomain, 0, 5);
+            System.arraycopy(bytesTemp, 7, addressDomain, 0, 5);
             String str1 = getKeyFromArray(addressDomain); //生成key
             logger.info("根据地址域生成的Key为：" + str1);
+            logger.info("根据注册信息解析手机号：" + Tool.getMobileNO(new String(bytesTemp,"utf-8")));
+//            TCPServerNetty.getMap().put(Tool.getMobileNO(new String(msg,"utf-8")), ctx);
 
         } else {
             logger.info("上述消息是从设备采集到的消息！");
-            TCPServerNetty.getMessageMap().put("1", msg);
+            TCPServerNetty.getMessageMap().put("1", bytesTemp);
         }
-        ctx.channel().write(msg);
+        ctx.channel().write(bytesTemp);
     }
 
     @Override

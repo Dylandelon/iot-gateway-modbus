@@ -1,0 +1,100 @@
+server:
+  port: 8700
+  #Use behind a front-end proxy server
+  use-forward-headers: true
+  #HTTP response compression is supported by Jetty, Tomcat, and Undertow.
+  compression:
+    enabled: true
+    #By default, responses must be at least 2048 bytes in length for compression to be performed
+    min-response-size: 2048
+    #By default, responses will only be compressed if their content type is one of the following.
+    #text/html,text/xml,text/plain,text/css
+    mime-types: text/html,text/xml,text/plain,text/css,application/json,application/javascript
+  session:
+    cookie:
+      http-only: true
+  tomcat:
+    uri-encoding: UTF-8
+   # 存放Tomcat的日志、Dump等文件的临时文件夹，默认为系统的tmp文件夹（如：C:%users\Shanhy\AppData\Local\Temp）
+    basedir: ${enn.baseDir}/tomcat
+    accesslog:
+      enabled: true
+      pattern: '%h %l %u [%{yyyy-MM-dd HH:mm:ss}t] %{X-Real-IP}i "%r" %s %b %D'
+spring:
+  datasource:
+    url: 'jdbc:mysql://10.39.10.227:3306/wizbox_dev?useUnicode=true&characterEncoding=UTF8&useSSL=false'
+#    url: 'jdbc:mysql://10.39.10.244:3306/ems_dev?useUnicode=true&characterEncoding=UTF8&useSSL=false'
+    username: iotadmin
+    password: 1qazXSw@
+    #### 以下配置项无需修改 ####
+    #Fully qualified name of the JDBC driver. Auto-detected based on the URL by default.
+    driver-class-name: com.mysql.jdbc.Driver
+    #Fully qualified name of the connection pool implementation to use. By default, it is auto-detected from the classpath.
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      auto-commit: false
+      # 等待连接池分配连接的最大时长（毫秒），超过这个时长还没可用的连接则发生SQLException， 缺省:30秒
+      connection-timeout: 10000
+      # 设定连接校验的超时时间， 缺省:5秒
+      validation-timeout: 5000
+      connectionTestQuery: SELECT 1
+      leak-detection-threshold: 10000
+      # 一个连接idle状态的最大时长（毫秒），超时则被释放（retired），缺省:10分钟
+      idle-timeout: 600000
+      # 一个连接的生命时长（毫秒），超时而且没被使用则被释放（retired），缺省:30分钟
+      # 建议设置比数据库超时时长少30秒，参考MySQL wait_timeout参数（show variables like '%timeout%';）
+      # 当前数据库wait_timeout: 3600秒
+      max-lifetime: 1800000
+      # 连接池中允许的最大连接数。缺省值：10；推荐的公式：((core_count * 2) + effective_spindle_count)
+      maximum-pool-size: 10
+      # 连接池中允许的最大空闲连接数。缺省值：10；
+      minimum-idle: 2
+      pool-name: HikariConnPool
+      #### MySQL Performance Tips  https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+        useLocalSessionState: true
+        rewriteBatchedStatements: true
+        cacheResultSetMetadata: true
+        cacheServerConfiguration: true
+        elideSetAutoCommits: true
+        maintainTimeStats: false
+  jpa:
+    hibernate:
+      ddl-auto: update
+      connection:
+        provider_class: org.hibernate.hikaricp.internal.HikariCPConnectionProvider
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+        generate_statistics: false
+    show-sql: false
+  cloud:
+    bus:
+      trace:
+        enabled: true
+      enabled: true
+  rabbitmq:
+    host: 10.39.10.116
+    port: 5672
+    username: UES-zhongde
+    password: 1234567u
+    virtual-host: UES-zhongde
+management:
+  security:
+    enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: refresh
+logging:
+  level:
+    root: info
+enn:
+  logging:
+    kafka:
+      bootstrap-servers: 10.39.10.146:9092,10.39.10.147:9092,10.39.10.148:9092
+      topic: enn_logging_kafka_topic

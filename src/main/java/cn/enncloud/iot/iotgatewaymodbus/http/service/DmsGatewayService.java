@@ -2,6 +2,7 @@ package cn.enncloud.iot.iotgatewaymodbus.http.service;
 
 
 import cn.enncloud.iot.iotgatewaymodbus.http.response.DataRespBody;
+import cn.enncloud.iot.iotgatewaymodbus.http.service.impl.DmsGatewayServiceImpl;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
