@@ -1,14 +1,9 @@
 package cn.enncloud.iot.iotgatewaymodbus.http.controller;
 
-import cn.enncloud.iot.iotgatewaymodbus.entity.exception.ConnectionException;
-import cn.enncloud.iot.iotgatewaymodbus.entity.exception.ErrorResponseException;
-import cn.enncloud.iot.iotgatewaymodbus.entity.exception.NoResponseException;
-import cn.enncloud.iot.iotgatewaymodbus.entity.func.WriteSingleCoil;
-import cn.enncloud.iot.iotgatewaymodbus.entity.func.response.WriteMultipleRegistersResponse;
-import cn.enncloud.iot.iotgatewaymodbus.example.ClientForTests;
-import cn.enncloud.iot.iotgatewaymodbus.http.configration.CRC16;
-import cn.enncloud.iot.iotgatewaymodbus.http.configration.Crc16ModbusUtil;
-import cn.enncloud.iot.iotgatewaymodbus.http.configration.TCPServerNetty;
+import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DeviceInfo;
+import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DmsGatewayEntity;
+import cn.enncloud.iot.iotgatewaymodbus.http.tools.CRC16;
+import cn.enncloud.iot.iotgatewaymodbus.netty.TCPServerNetty;
 import cn.enncloud.iot.iotgatewaymodbus.http.constants.CodeEnum;
 import cn.enncloud.iot.iotgatewaymodbus.http.response.DataRespBody;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.GatewayApiService;
@@ -17,13 +12,9 @@ import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.PointDTO;
 import cn.enncloud.iot.iotgatewaymodbus.http.tools.Tool;
 import cn.enncloud.iot.iotgatewaymodbus.http.tools.ValidatorTools;
 import cn.enncloud.iot.iotgatewaymodbus.http.vo.dto.DmsGateWayDevicControlVo;
-import cn.enncloud.iot.iotgatewaymodbus.server.ModbusClient;
-import cn.enncloud.iot.iotgatewaymodbus.server.ModbusServer;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.util.AttributeKey;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,22 +73,25 @@ public class CommandController {
 
 
 
+        List<DmsGatewayEntity> dmsGatewayEntityList = gatewayApiService.getDatewayDTOFromApiByGatewayId(entity.getGatewayId());
 
 
 //        byte[] bytesWrite2 = TCPServerNetty.hexToByteArray("010300000001840A");
-        TCPServerNetty.getMap().entrySet().forEach(ch->{
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("01060000").append(String.format("%04x", Integer.valueOf(entity.getValue())));
-
-
-            byte[] bytesWrite4 = TCPServerNetty.hexToByteArray(sb.toString());
-
-            log.info("向设备下发的信息为："+TCPServerNetty.bytesToHexString(CRC16.addCRC(bytesWrite4)));
-
-            ch.getValue().writeAndFlush(CRC16.addCRC(bytesWrite4));
-        });
-        ChannelHandlerContext  channel = TCPServerNetty.getMap().get("10.4.95.71");
+//        TCPServerNetty.getMap().entrySet().forEach(ch->{
+//
+//            StringBuilder sb = new StringBuilder();
+//            sb.append("01060000").append(String.format("%04x", Integer.valueOf(entity.getValue())));
+//
+//
+//            byte[] bytesWrite4 = TCPServerNetty.hexToByteArray(sb.toString());
+//
+//            log.info("向设备下发的信息为："+TCPServerNetty.bytesToHexString(CRC16.addCRC(bytesWrite4)));
+//
+//            ch.getValue().writeAndFlush(CRC16.addCRC(bytesWrite4));
+//        });
+        ChannelHandlerContext  channel = TCPServerNetty.getMap().get(dmsGatewayEntityList.get(0).getSerialNum());
+//        AttributeKey<String> attributeKey = AttributeKey.valueOf("deviceInfoList");
+//        channel.channel().attr(attributeKey).set("aaaabbbb");
 //        ByteBuf buf = ChannelHandlerContext.alloc().buffer(bytesWrite2.length);
 
 

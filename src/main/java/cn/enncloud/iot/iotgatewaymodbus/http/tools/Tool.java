@@ -1,7 +1,5 @@
 package cn.enncloud.iot.iotgatewaymodbus.http.tools;
 
-import cn.enncloud.iot.iotgatewaymodbus.http.configration.TCPServerNetty;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

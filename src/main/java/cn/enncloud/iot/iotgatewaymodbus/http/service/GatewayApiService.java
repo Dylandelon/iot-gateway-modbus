@@ -1,8 +1,10 @@
 package cn.enncloud.iot.iotgatewaymodbus.http.service;
 
 
+import cn.enncloud.iot.iotgatewaymodbus.http.response.DataRespBody;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,4 +49,10 @@ public interface GatewayApiService {
      * 获取新奥376.1协议点表信息
      */
     Map<String, ProtocolPointInfo> getXinao376PointDTOMapFromApi(int protocolTypeId);
+
+    List<DmsGatewayEntity> getDatewayDTOFromApiByDomain(String domain);
+    List<DmsDeviceEntity> getDeviceDTOFromApiByGatewayId(long gatewayId);
+
+    List<DmsProtocolPointModbusEntity> getModbusPointDTOFromApiByDeviceId(long deviceId);
+    List<DmsGatewayEntity> getDatewayDTOFromApiByGatewayId(long gatewayId);
 }

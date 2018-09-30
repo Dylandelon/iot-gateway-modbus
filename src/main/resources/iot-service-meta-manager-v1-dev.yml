@@ -98,3 +98,12 @@ enn:
     kafka:
       bootstrap-servers: 10.39.10.146:9092,10.39.10.147:9092,10.39.10.148:9092
       topic: enn_logging_kafka_topic
+job:
+  real-time:
+    cron: 0/5 * * * * ?
+  mending:
+    fixedDelay: 30000
+    enabled: false
+  digital:
+    cron: 0 0 0/1 * * ?
+    period: 1

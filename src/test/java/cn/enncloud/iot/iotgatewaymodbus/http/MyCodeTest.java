@@ -1,6 +1,6 @@
 package cn.enncloud.iot.iotgatewaymodbus.http;
 
-import cn.enncloud.iot.iotgatewaymodbus.http.configration.TCPServerNetty;
+import cn.enncloud.iot.iotgatewaymodbus.netty.TCPServerNetty;
 import cn.enncloud.iot.iotgatewaymodbus.http.tools.Tool;
 import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;

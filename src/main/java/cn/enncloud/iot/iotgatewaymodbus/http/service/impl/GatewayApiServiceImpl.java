@@ -236,4 +236,97 @@ public class GatewayApiServiceImpl implements GatewayApiService {
         }
         return pointInfoMap;
     }
+    @Override
+    public List<DmsGatewayEntity> getDatewayDTOFromApiByDomain(String domain) {
+        DataRespBody<List<DmsGatewayEntity>> dataRespBody = null;
+        Long beginTime = System.currentTimeMillis();
+        try {
+            dataRespBody = dmsGatewayService.dmsGatewayGet(null, null, domain, null);
+//            if (log.isDebugEnabled()) {
+//                log.debug(messageSource.getMessage(
+//                        LogKeyConst.LOG_META_DEBUG_211,
+//                        new Object[]{System.currentTimeMillis() - beginTime},
+//                        LogKeyConst.LOG_DEFAULT,
+//                        Locale.CHINA));
+//            }
+
+        } catch (Exception ex) {
+//            log.error(messageSource.getMessage(
+//                    LogKeyConst.LOG_META_ERROR_212,
+//                    new Object[]{System.currentTimeMillis() - beginTime, serialNum, JsonUtils.writeValueAsString(dataRespBody)},
+//                    LogKeyConst.LOG_DEFAULT,
+//                    Locale.CHINA), ex);
+        }
+        return dataRespBody.getData();
+    }
+    @Override
+    public List<DmsDeviceEntity> getDeviceDTOFromApiByGatewayId(long gatewayId) {
+        DeviceDTO deviceDTO = null;
+        DataRespBody<List<DmsDeviceEntity>> dataRespBody = null;
+        Long beginTime = System.currentTimeMillis();
+        try {
+            dataRespBody = dmsGatewayService.dmsDeviceGet(null, gatewayId, null);
+//            if (log.isDebugEnabled()) {
+//                log.debug(messageSource.getMessage(
+//                        LogKeyConst.LOG_META_DEBUG_213,
+//                        new Object[]{System.currentTimeMillis() - beginTime},
+//                        LogKeyConst.LOG_DEFAULT,
+//                        Locale.CHINA));
+//            }
+
+        } catch (Exception ex) {
+//            log.error(messageSource.getMessage(
+//                    LogKeyConst.LOG_META_ERROR_214,
+//                    new Object[]{System.currentTimeMillis() - beginTime, gatewayId, JsonUtils.writeValueAsString(dataRespBody)},
+//                    LogKeyConst.LOG_DEFAULT,
+//                    Locale.CHINA), ex);
+        }
+        return dataRespBody.getData();
+    }
+    @Override
+    public List<DmsProtocolPointModbusEntity> getModbusPointDTOFromApiByDeviceId(long deviceId) {
+        DataRespBody<List<DmsProtocolPointModbusEntity>> dataRespBody = null;
+        Long beginTime = System.currentTimeMillis();
+        try {
+            dataRespBody = dmsGatewayService.dmsPointForGateway(deviceId);
+//            if (log.isDebugEnabled()) {
+//                log.debug(messageSource.getMessage(
+//                        LogKeyConst.LOG_META_DEBUG_215,
+//                        new Object[]{System.currentTimeMillis() - beginTime},
+//                        LogKeyConst.LOG_DEFAULT,
+//                        Locale.CHINA));
+//            }
+
+        } catch (Exception ex) {
+//            log.error(messageSource.getMessage(
+//                    LogKeyConst.LOG_META_ERROR_216,
+//                    new Object[]{System.currentTimeMillis() - beginTime, deviceId, JsonUtils.writeValueAsString(dataRespBody)},
+//                    LogKeyConst.LOG_DEFAULT,
+//                    Locale.CHINA), ex);
+        }
+        return dataRespBody.getData();
+    }
+    @Override
+    public List<DmsGatewayEntity> getDatewayDTOFromApiByGatewayId(long gatewayId) {
+        DataRespBody<List<DmsGatewayEntity>> dataRespBody = null;
+        Long beginTime = System.currentTimeMillis();
+        try {
+            dataRespBody = dmsGatewayService.dmsGatewayGet(gatewayId, null, null, null);
+//            if (log.isDebugEnabled()) {
+//                log.debug(messageSource.getMessage(
+//                        LogKeyConst.LOG_META_DEBUG_211,
+//                        new Object[]{System.currentTimeMillis() - beginTime},
+//                        LogKeyConst.LOG_DEFAULT,
+//                        Locale.CHINA));
+//            }
+
+        } catch (Exception ex) {
+//            log.error(messageSource.getMessage(
+//                    LogKeyConst.LOG_META_ERROR_212,
+//                    new Object[]{System.currentTimeMillis() - beginTime, serialNum, JsonUtils.writeValueAsString(dataRespBody)},
+//                    LogKeyConst.LOG_DEFAULT,
+//                    Locale.CHINA), ex);
+        }
+        return dataRespBody.getData();
+    }
 }
