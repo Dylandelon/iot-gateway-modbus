@@ -14,8 +14,29 @@ spring:
         enabled: true
         service-id: iot-config-server
       fail-fast: true
+    stream:
+      default-binder: kafka
+      bindings:
+        output:
+          destination: data_iot_HPS_uncim
+          contentType: application/json
+      kafka:
+        bindings:
+          output:
+            producer:
+              messageKeyExpression: payload.header.gatewayId
+        binder:
+          brokers: 10.39.10.146:9092,10.39.10.147:9092,10.39.10.148:9092
+          zk-nodes: 10.39.10.143:2181,10.39.10.144:2181,10.39.10.145:2181
+#  spring.cloud.stream.kafka.binder.configuration.security.protocol=SASL_SSL
   messages:
     basename: i18n/log_messages
+  kafka:
+#    bootstrap-servers: 10.39.10.146:9092,10.39.10.147:9092,10.39.10.148:9092
+    producer:
+      client-id: cmdkafka
+#      bootstrap-servers: 10.39.10.146:9092,10.39.10.147:9092,10.39.10.148:9092
+
 
 eureka:
   #服务实例元数据配置

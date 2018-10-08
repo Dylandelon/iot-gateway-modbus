@@ -60,7 +60,7 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
 
         } else {
             logger.info("上述消息是从设备采集到的消息！");
-            TCPServerNetty.getMessageMap().put("1", bytesTemp);
+            TCPServerNetty.getMessageMap().put(Tool.getMobileNO(new String(msg,"utf-8")), bytesTemp);
         }
         ctx.channel().write(bytesTemp);
     }

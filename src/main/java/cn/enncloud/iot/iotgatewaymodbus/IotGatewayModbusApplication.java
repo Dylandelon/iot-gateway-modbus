@@ -24,8 +24,8 @@ public class IotGatewayModbusApplication {
 //            e.printStackTrace();
 //        }
         try {
-//            new TCPServerNetty(80).start();
-            new TCPServerNetty(8081).start();
+            new TCPServerNetty(80).start();
+//            new TCPServerNetty(8081).start();
         } catch (Exception e) {
             e.printStackTrace();
         }

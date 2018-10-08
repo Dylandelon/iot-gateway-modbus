@@ -3,7 +3,9 @@ package cn.enncloud.iot.iotgatewaymodbus.http.service;
 
 import cn.enncloud.iot.iotgatewaymodbus.http.response.DataRespBody;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.impl.DmsGatewayServiceImpl;
+import cn.enncloud.iot.iotgatewaymodbus.http.vo.dto.DmsGateWayUpdateVo;
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -61,5 +63,8 @@ public interface DmsGatewayService {
      */
     @RequestMapping(value = "/dmsXinao3761ProtocolPoint", method = RequestMethod.GET)
     DataRespBody dmsXinao3761ProtocolPoint(@RequestParam(value = "protocolTypeId", required = false) Long protocolTypeId) throws Exception;
+
+    @RequestMapping(value = "/dmsGateWayUpdate",method = RequestMethod.POST)
+    DataRespBody dmsGateWayUpdatePost(@RequestBody DmsGateWayUpdateVo entity) throws Exception;
 
 }

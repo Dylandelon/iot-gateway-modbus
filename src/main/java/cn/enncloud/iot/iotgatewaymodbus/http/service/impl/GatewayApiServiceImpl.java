@@ -1,10 +1,14 @@
 package cn.enncloud.iot.iotgatewaymodbus.http.service.impl;
 
 
+import cn.enncloud.iot.iotgatewaymodbus.http.constants.CodeEnum;
 import cn.enncloud.iot.iotgatewaymodbus.http.response.DataRespBody;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.DmsGatewayService;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.GatewayApiService;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.*;
+import cn.enncloud.iot.iotgatewaymodbus.http.vo.dto.DmsGateWayUpdateVo;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -238,34 +242,35 @@ public class GatewayApiServiceImpl implements GatewayApiService {
     }
     @Override
     public List<DmsGatewayEntity> getDatewayDTOFromApiByDomain(String domain) {
-        DataRespBody<List<DmsGatewayEntity>> dataRespBody = null;
+        DataRespBody dataRespBody = null;
+        List<DmsGatewayEntity> dmsGatewayEntityList = new ArrayList<>();
         Long beginTime = System.currentTimeMillis();
         try {
             dataRespBody = dmsGatewayService.dmsGatewayGet(null, null, domain, null);
-//            if (log.isDebugEnabled()) {
-//                log.debug(messageSource.getMessage(
-//                        LogKeyConst.LOG_META_DEBUG_211,
-//                        new Object[]{System.currentTimeMillis() - beginTime},
-//                        LogKeyConst.LOG_DEFAULT,
-//                        Locale.CHINA));
-//            }
+            ObjectMapper mapper = new ObjectMapper();
+            dmsGatewayEntityList = mapper.convertValue(dataRespBody.getData(),new TypeReference<List<DmsGatewayEntity>>() {});
+
 
         } catch (Exception ex) {
+            log.error("aaaaaa");
 //            log.error(messageSource.getMessage(
 //                    LogKeyConst.LOG_META_ERROR_212,
 //                    new Object[]{System.currentTimeMillis() - beginTime, serialNum, JsonUtils.writeValueAsString(dataRespBody)},
 //                    LogKeyConst.LOG_DEFAULT,
 //                    Locale.CHINA), ex);
         }
-        return dataRespBody.getData();
+        return dmsGatewayEntityList;
     }
     @Override
     public List<DmsDeviceEntity> getDeviceDTOFromApiByGatewayId(long gatewayId) {
         DeviceDTO deviceDTO = null;
         DataRespBody<List<DmsDeviceEntity>> dataRespBody = null;
+        List<DmsDeviceEntity> dmsDeviceEntityList = null;
         Long beginTime = System.currentTimeMillis();
         try {
             dataRespBody = dmsGatewayService.dmsDeviceGet(null, gatewayId, null);
+            ObjectMapper mapper = new ObjectMapper();
+            dmsDeviceEntityList = mapper.convertValue(dataRespBody.getData(),new TypeReference<List<DmsDeviceEntity>>() {});
 //            if (log.isDebugEnabled()) {
 //                log.debug(messageSource.getMessage(
 //                        LogKeyConst.LOG_META_DEBUG_213,
@@ -281,14 +286,17 @@ public class GatewayApiServiceImpl implements GatewayApiService {
 //                    LogKeyConst.LOG_DEFAULT,
 //                    Locale.CHINA), ex);
         }
-        return dataRespBody.getData();
+        return dmsDeviceEntityList;
     }
     @Override
     public List<DmsProtocolPointModbusEntity> getModbusPointDTOFromApiByDeviceId(long deviceId) {
         DataRespBody<List<DmsProtocolPointModbusEntity>> dataRespBody = null;
+        List<DmsProtocolPointModbusEntity> dmsProtocolPointModbusEntityList = null;
         Long beginTime = System.currentTimeMillis();
         try {
             dataRespBody = dmsGatewayService.dmsPointForGateway(deviceId);
+            ObjectMapper mapper = new ObjectMapper();
+            dmsProtocolPointModbusEntityList = mapper.convertValue(dataRespBody.getData(),new TypeReference<List<DmsProtocolPointModbusEntity>>() {});
 //            if (log.isDebugEnabled()) {
 //                log.debug(messageSource.getMessage(
 //                        LogKeyConst.LOG_META_DEBUG_215,
@@ -304,14 +312,17 @@ public class GatewayApiServiceImpl implements GatewayApiService {
 //                    LogKeyConst.LOG_DEFAULT,
 //                    Locale.CHINA), ex);
         }
-        return dataRespBody.getData();
+        return dmsProtocolPointModbusEntityList;
     }
     @Override
     public List<DmsGatewayEntity> getDatewayDTOFromApiByGatewayId(long gatewayId) {
         DataRespBody<List<DmsGatewayEntity>> dataRespBody = null;
+        List<DmsGatewayEntity> dmsGatewayEntityList = null;
         Long beginTime = System.currentTimeMillis();
         try {
             dataRespBody = dmsGatewayService.dmsGatewayGet(gatewayId, null, null, null);
+            ObjectMapper mapper = new ObjectMapper();
+            dmsGatewayEntityList = mapper.convertValue(dataRespBody.getData(),new TypeReference<List<DmsGatewayEntity>>() {});
 //            if (log.isDebugEnabled()) {
 //                log.debug(messageSource.getMessage(
 //                        LogKeyConst.LOG_META_DEBUG_211,
@@ -327,6 +338,34 @@ public class GatewayApiServiceImpl implements GatewayApiService {
 //                    LogKeyConst.LOG_DEFAULT,
 //                    Locale.CHINA), ex);
         }
-        return dataRespBody.getData();
+        return dmsGatewayEntityList;
+    }
+
+    @Override
+    public boolean dmsGateWayUpdatePost(DmsGateWayUpdateVo entity) {
+        DataRespBody<List<DmsGatewayEntity>> dataRespBody = null;
+        boolean flag = false;
+        Long beginTime = System.currentTimeMillis();
+        try {
+            dataRespBody = dmsGatewayService.dmsGateWayUpdatePost(entity);
+//            if (log.isDebugEnabled()) {
+//                log.debug(messageSource.getMessage(
+//                        LogKeyConst.LOG_META_DEBUG_211,
+//                        new Object[]{System.currentTimeMillis() - beginTime},
+//                        LogKeyConst.LOG_DEFAULT,
+//                        Locale.CHINA));
+//            }
+
+        } catch (Exception ex) {
+//            log.error(messageSource.getMessage(
+//                    LogKeyConst.LOG_META_ERROR_212,
+//                    new Object[]{System.currentTimeMillis() - beginTime, serialNum, JsonUtils.writeValueAsString(dataRespBody)},
+//                    LogKeyConst.LOG_DEFAULT,
+//                    Locale.CHINA), ex);
+        }
+        if(CodeEnum.IOT_SUCCESS.getCode().equalsIgnoreCase(dataRespBody.getCode())){
+            flag = true;
+        }
+        return flag;
     }
 }

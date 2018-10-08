@@ -28,7 +28,7 @@ public class ModbusProto {
     /**
      * 封装下行协议
      */
-    public static MsgPack getDownProtocolCmdDTO(DmsDeviceEntity deviceInfo, List<DmsProtocolPointModbusEntity> pointDTO, CmdMsg cmdMsg) {
+    public static MsgPack getDownProtocolCmdDTO(DmsDeviceEntity deviceInfo, List<DmsProtocolPointModbusEntity> pointDTO) {
 
         //将点表信息
         MsgPack msgPack=new MsgPack();
@@ -39,13 +39,14 @@ public class ModbusProto {
         for(int i=0;i<size;i++)
         {
             DmsProtocolPointModbusEntity info=pointDTO.get(i);
-            if(pointDTO.get(i).getDmsPointName().equals(cmdMsg.getPonintName()))
-            {
-                msgPack.startAddress=info.getRegisterAddress();
-                msgPack.registerNum=info.getRegisterLen();
-                //msgPack.value=cmdMsg.value
-                msgPack.funCode=Byte.parseByte(info.getRemark().trim());
-            }
+//            if(pointDTO.get(i).getDmsPointName().equals(cmdMsg.getPonintName()))
+//            {
+//
+//            }
+            msgPack.startAddress=info.getRegisterAddress();
+            msgPack.registerNum=info.getRegisterLen();
+            //msgPack.value=cmdMsg.value
+            msgPack.funCode=Byte.parseByte(info.getRemark().trim());
         }
         return msgPack;
     }

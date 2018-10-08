@@ -1,6 +1,9 @@
 package cn.enncloud.iot.iotgatewaymodbus.http.service.dtos;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import lombok.Data;
 import lombok.ToString;
 
@@ -24,11 +27,11 @@ public class DmsProtocolPointModbusEntity {
     private String dataFormat;
     private long dmsPointId;
     private long dmsProtocolPointGroupId;
-//    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime gmtCreate;
-//    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime gmtModified;
     private String modifier;
     private String name;

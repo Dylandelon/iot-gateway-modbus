@@ -3,6 +3,7 @@ package cn.enncloud.iot.iotgatewaymodbus.http.service;
 
 import cn.enncloud.iot.iotgatewaymodbus.http.response.DataRespBody;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.*;
+import cn.enncloud.iot.iotgatewaymodbus.http.vo.dto.DmsGateWayUpdateVo;
 
 import java.util.List;
 import java.util.Map;
@@ -55,4 +56,5 @@ public interface GatewayApiService {
 
     List<DmsProtocolPointModbusEntity> getModbusPointDTOFromApiByDeviceId(long deviceId);
     List<DmsGatewayEntity> getDatewayDTOFromApiByGatewayId(long gatewayId);
+    boolean dmsGateWayUpdatePost(DmsGateWayUpdateVo entity);
 }
