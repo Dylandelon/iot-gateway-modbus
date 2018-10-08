@@ -1,6 +1,9 @@
 package cn.enncloud.iot.iotgatewaymodbus.http.job;
 
-import cn.enncloud.iot.iotgatewaymodbus.http.configration.*;
+import cn.enncloud.iot.iotgatewaymodbus.http.configration.DevPonitCtr;
+import cn.enncloud.iot.iotgatewaymodbus.http.configration.ModbusProto;
+import cn.enncloud.iot.iotgatewaymodbus.http.configration.MsgPack;
+import cn.enncloud.iot.iotgatewaymodbus.http.configration.ReadUpInfo;
 import cn.enncloud.iot.iotgatewaymodbus.http.constants.Constant;
 import cn.enncloud.iot.iotgatewaymodbus.http.constants.Constants;
 import cn.enncloud.iot.iotgatewaymodbus.http.data.IotDevice;
@@ -18,6 +21,7 @@ import cn.enncloud.iot.iotgatewaymodbus.http.vo.dto.DmsGateWayListVo;
 import cn.enncloud.iot.iotgatewaymodbus.http.vo.dto.DmsGateWayUpdateVo;
 import cn.enncloud.iot.iotgatewaymodbus.netty.TCPServerNetty;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.util.AttributeKey;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
@@ -104,6 +108,8 @@ public class PointInfoJob implements Runnable{
 
                     log.info("向设备下发的信息为："+TCPServerNetty.bytesToHexString(CRC16.addCRC(bytesWrite4)));
 
+                    AttributeKey<DmsDeviceEntity> attributeKey = AttributeKey.valueOf("dmsDeviceEntity");
+                    channel.channel().attr(attributeKey).set(dmsDeviceEntity);
                     channel.writeAndFlush(CRC16.addCRC(bytesWrite4));
                     long startTime = System.currentTimeMillis();
                     ReadUpInfo readUpInfo=null;

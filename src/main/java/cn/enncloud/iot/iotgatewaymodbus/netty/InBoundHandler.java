@@ -1,14 +1,18 @@
 package cn.enncloud.iot.iotgatewaymodbus.netty;
 
+import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DeviceInfo;
+import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DmsDeviceEntity;
 import cn.enncloud.iot.iotgatewaymodbus.http.tools.Tool;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -51,16 +55,17 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
 //        String str1 = getKeyFromArray(addressDomain); //生成key
 //        logger.info("根据地址域生成的Key为：" + str1);
 
-        if (byteA3 == 115) {
-            byte[] addressDomain = new byte[5];
-            System.arraycopy(msg, 7, addressDomain, 0, 5);
-            String str1 = getKeyFromArray(addressDomain); //生成key
-            logger.info("根据地址域生成的Key为：" + str1);
+        AttributeKey<DmsDeviceEntity> attributeKey = AttributeKey.valueOf("DmsDeviceEntity");
+        DmsDeviceEntity dmsDeviceEntity = ctx.channel().attr(attributeKey).get();
+        if(dmsDeviceEntity ==null){
+//            byte[] addressDomain = new byte[5];
+//            System.arraycopy(msg, 7, addressDomain, 0, 5);
+//            String str1 = getKeyFromArray(addressDomain); //生成key
+//            logger.info("根据地址域生成的Key为：" + str1);
             logger.info("根据注册信息解析手机号：" + Tool.getMobileNO(new String(msg,"utf-8")));
             TCPServerNetty.getMap().put(Tool.getMobileNO(new String(msg,"utf-8")), ctx);
             ctx.channel().write(msg);
-
-        } else {
+        }else{
             logger.info("来自设备的信息2：" + TCPServerNetty.bytesToHexStringCompact(msg));
 
             String plainText=Tool.SC_Tea_Encryption_Str(TCPServerNetty.bytesToHexStringCompact(msg),"2018091200000000");
@@ -68,7 +73,7 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
             byte[] bytesTemp = TCPServerNetty.hexToByteArray(plainText);
 
             logger.info("上述消息是从设备采集到的消息！");
-            TCPServerNetty.getMessageMap().put(Tool.getMobileNO(new String(msg,"utf-8")), bytesTemp);
+            TCPServerNetty.getMessageMap().put(dmsDeviceEntity.getId(), bytesTemp);
             ctx.channel().write(bytesTemp);
         }
 

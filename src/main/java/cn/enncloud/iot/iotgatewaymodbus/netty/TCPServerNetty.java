@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TCPServerNetty {
     private int port;
     private static Map<String, ChannelHandlerContext> map = new ConcurrentHashMap<String, ChannelHandlerContext>();
-    private static Map<String, byte[]> messageMap = new ConcurrentHashMap<String, byte[]>();
+    private static Map<Long, byte[]> messageMap = new ConcurrentHashMap<Long, byte[]>();
 
     public TCPServerNetty(int port) {
         this.port = port;
@@ -120,14 +120,14 @@ public class TCPServerNetty {
     /**
      * @return the messageMap
      */
-    public static Map<String, byte[]> getMessageMap() {
+    public static Map<Long, byte[]> getMessageMap() {
         return messageMap;
     }
 
     /**
      * @param messageMap the messageMap to set
      */
-    public static void setMessageMap(Map<String, byte[]> messageMap) {
+    public static void setMessageMap(Map<Long, byte[]> messageMap) {
         TCPServerNetty.messageMap = messageMap;
     }
     /**
