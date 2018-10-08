@@ -97,7 +97,7 @@ public class PointInfoJob implements Runnable{
 //                CmdMsg cmdMsg = new CmdMsg(1,"PAs","0");
                     MsgPack msgPack = ModbusProto.getDownProtocolCmdDTO(dmsDeviceEntity,dmsProtocolPointModbusEntityList);
                     byte[] onepa = ModbusProto.getBytesBuf(msgPack);
-                    log.info("设备的信息采集：" + TCPServerNetty.bytesToHexStringCompact(onepa));
+                    log.info("设备的信息采集：" + TCPServerNetty. bytesToHexStringCompact(onepa));
 
                     String cipherText=Tool.SC_Tea_Encryption_Str(TCPServerNetty.bytesToHexStringCompact(onepa),"2018091200000000");
                     byte[] bytesWrite4 = TCPServerNetty.hexToByteArray(cipherText);

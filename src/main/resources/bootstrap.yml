@@ -1,5 +1,5 @@
 enn:
-  baseDir: ~/data/iot/${spring.application.name}
+  baseDir: /data/iot/${spring.application.name}
 spring:
   application:
     name: iot-gateway-modbus-v1
