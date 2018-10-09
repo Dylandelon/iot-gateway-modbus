@@ -102,21 +102,21 @@ public class PointInfoJob implements Runnable{
 //                CmdMsg cmdMsg = new CmdMsg(1,"PAs","0");
                     MsgPack msgPack = ModbusProto.getDownProtocolCmdDTO(dmsDeviceEntity,dmsProtocolPointModbusEntityList);
                     byte[] onepa = ModbusProto.getBytesBuf(msgPack);
-                    log.info("设备的信息采集：" + TCPServerNetty. bytesToHexStringCompact(onepa));
-
-                    String cipherText=Tool.SC_Tea_Encryption_Str(TCPServerNetty.bytesToHexStringCompact(onepa),"2018091200000000");
-                    byte[] bytesWrite4 = TCPServerNetty.hexToByteArray(cipherText);
-
-                    log.info("向设备下发的信息为："+TCPServerNetty.bytesToHexString(CRC16.addCRC(bytesWrite4)));
-
+                    byte[] bytesWrite = CRC16.addCRC(onepa);
+                    log.info("向设备下发的信息未加密为："+TCPServerNetty.bytesToHexString(bytesWrite));
+                    String cipherText = Tool.SC_Tea_Encryption_Str(TCPServerNetty.bytesToHexStringCompact(bytesWrite),"2018091200000000");
+                    byte[] bytesWriteSec = TCPServerNetty.hexToByteArray(cipherText);
+                    log.info("向设备下发的信息加密为："+TCPServerNetty.bytesToHexString(bytesWriteSec));
+                 ;
                     AttributeKey<DmsDeviceEntity> attributeKey = AttributeKey.valueOf("dmsDeviceEntity");
                     channel.channel().attr(attributeKey).set(dmsDeviceEntity);
-                    channel.writeAndFlush(CRC16.addCRC(bytesWrite4));
+                    channel.writeAndFlush(bytesWriteSec);
                     long startTime = System.currentTimeMillis();
                     ReadUpInfo readUpInfo=null;
                     IotMessage kafkaData=null;
                     while (System.currentTimeMillis() - startTime <20*1000){
                         byte[] bytesRec = TCPServerNetty.getMessageMap().get(dmsDeviceEntity.getId());
+//                        log.info("获取采集返回的信息："+bytesRec);
                         if(bytesRec != null ){
 
                             try {

@@ -3,6 +3,7 @@ package cn.enncloud.iot.iotgatewaymodbus.http.configration;
 
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.*;
 import cn.enncloud.iot.iotgatewaymodbus.http.tools.Tool;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -46,7 +47,12 @@ public class ModbusProto {
             msgPack.startAddress=info.getRegisterAddress();
             msgPack.registerNum=info.getRegisterLen();
             //msgPack.value=cmdMsg.value
-            msgPack.funCode=Byte.parseByte(info.getRemark().trim());
+            if(info.getRemark() == null || StringUtils.isEmpty(info.getRemark())){
+                msgPack.funCode=3;
+            }else{
+                msgPack.funCode=Byte.parseByte(info.getRemark().trim());
+            }
+
         }
         return msgPack;
     }

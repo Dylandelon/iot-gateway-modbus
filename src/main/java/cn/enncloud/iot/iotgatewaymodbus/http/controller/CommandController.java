@@ -135,12 +135,15 @@ public class CommandController {
         sb.append("01060000").append(String.format("%04x", Integer.valueOf(entity.getValue())));
 
 
-        String cipherText = Tool.SC_Tea_Encryption_Str(sb.toString(),"2018091200000000");
-        byte[] bytesWrite4 = TCPServerNetty.hexToByteArray(cipherText);
 
-        log.info("向设备下发的信息为："+TCPServerNetty.bytesToHexString(CRC16.addCRC(bytesWrite4)));
+        byte[] bytesWriteMid = TCPServerNetty.hexToByteArray(sb.toString());
 
-        channel.writeAndFlush(CRC16.addCRC(bytesWrite4));
+        byte[] bytesWrite = CRC16.addCRC(bytesWriteMid);
+        log.info("向设备下发的信息未加密为："+TCPServerNetty.bytesToHexString(bytesWrite));
+        String cipherText = Tool.SC_Tea_Encryption_Str(TCPServerNetty.bytesToHexStringCompact(bytesWrite),"2018091200000000");
+        byte[] bytesWriteSec = TCPServerNetty.hexToByteArray(cipherText);
+        log.info("向设备下发的信息加密为："+TCPServerNetty.bytesToHexString(bytesWriteSec));
+        channel.writeAndFlush(bytesWriteSec);
 //                .addListener(new ChannelFutureListener(){
 //                    @Override
 //                    public void operationComplete(ChannelFuture future)
