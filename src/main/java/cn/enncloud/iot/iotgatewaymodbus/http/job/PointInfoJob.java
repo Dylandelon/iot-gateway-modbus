@@ -67,36 +67,37 @@ public class PointInfoJob implements Runnable{
         List<DmsGatewayEntity> dmsGatewayEntityList =  gatewayApiService.getDatewayDTOFromApiByDomain("HPS");
 
         dmsGatewayEntityList.forEach(dmsGatewayEntity -> {
-            DmsGateWayUpdateVo dmsGateWayUpdateVo = new DmsGateWayUpdateVo();
-            // ip+port
-            String ip = "";
-            try {
-                ip = InetAddress.getLocalHost().getHostAddress();
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            }
-            dmsGateWayUpdateVo.setId((int)dmsGatewayEntity.getId());
-            dmsGateWayUpdateVo.setType(dmsGatewayEntity.getType());
-            dmsGateWayUpdateVo.setRecentOnline(LocalDateTime.now());
-            dmsGateWayUpdateVo.setServerName(environment.getProperty("spring.application.name"));
-            dmsGateWayUpdateVo.setGatewayIp(ip);
-            dmsGateWayUpdateVo.setGatewayPort(Integer.valueOf(environment.getProperty("server.port")));
-            List<DmsGateWayListVo> gatewayList = new ArrayList<>();
-            DmsGateWayListVo dmsGateWayListVo = new DmsGateWayListVo();
-            dmsGateWayListVo.setId((int)dmsGatewayEntity.getId());
-            dmsGateWayListVo.setRecentOnline(LocalDateTime.now());
-            dmsGateWayUpdateVo.setGatewayList(gatewayList);
-            // 获取网关下设备
-            List<DmsDeviceEntity> dmsDeviceEntityList = gatewayApiService.getDeviceDTOFromApiByGatewayId(dmsGatewayEntity.getId());
-            dmsDeviceEntityList.forEach(dmsDeviceEntity -> {
-                // 获取设备下点表
-                List<DmsProtocolPointModbusEntity> dmsProtocolPointModbusEntityList = gatewayApiService.getModbusPointDTOFromApiByDeviceId(dmsDeviceEntity.getId());
+            // 根据网关获取channel
+            ChannelHandlerContext channel = TCPServerNetty.getMap().get(dmsGatewayEntity.getSerialNum());
+            if(channel == null){
+                log.info("网关没有注册："+dmsGatewayEntity.getSerialNum());
+            }else{
+                log.info("网关准备采集："+dmsGatewayEntity.getSerialNum());
+                DmsGateWayUpdateVo dmsGateWayUpdateVo = new DmsGateWayUpdateVo();
+                // ip+port
+                String ip = "";
+                try {
+                    ip = InetAddress.getLocalHost().getHostAddress();
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                }
+                dmsGateWayUpdateVo.setId((int)dmsGatewayEntity.getId());
+                dmsGateWayUpdateVo.setType(dmsGatewayEntity.getType());
+                dmsGateWayUpdateVo.setRecentOnline(LocalDateTime.now());
+                dmsGateWayUpdateVo.setServerName(environment.getProperty("spring.application.name"));
+                dmsGateWayUpdateVo.setGatewayIp(ip);
+                dmsGateWayUpdateVo.setGatewayPort(Integer.valueOf(environment.getProperty("server.port")));
+                List<DmsGateWayListVo> gatewayList = new ArrayList<>();
+                DmsGateWayListVo dmsGateWayListVo = new DmsGateWayListVo();
+                dmsGateWayListVo.setId((int)dmsGatewayEntity.getId());
+                dmsGateWayListVo.setRecentOnline(LocalDateTime.now());
+                dmsGateWayUpdateVo.setGatewayList(gatewayList);
+                // 获取网关下设备
+                List<DmsDeviceEntity> dmsDeviceEntityList = gatewayApiService.getDeviceDTOFromApiByGatewayId(dmsGatewayEntity.getId());
+                dmsDeviceEntityList.forEach(dmsDeviceEntity -> {
+                    // 获取设备下点表
+                    List<DmsProtocolPointModbusEntity> dmsProtocolPointModbusEntityList = gatewayApiService.getModbusPointDTOFromApiByDeviceId(dmsDeviceEntity.getId());
 
-                // 根据网关获取channel
-                ChannelHandlerContext channel = TCPServerNetty.getMap().get(dmsGatewayEntity.getSerialNum());
-                if(channel == null){
-                    log.info("网关没有注册："+dmsGatewayEntity.getSerialNum());
-                }else{
                     // 采集数据命令下发
 //                CmdMsg cmdMsg = new CmdMsg(1,"PAs","0");
                     MsgPack msgPack = ModbusProto.getDownProtocolCmdDTO(dmsDeviceEntity,dmsProtocolPointModbusEntityList);
@@ -146,12 +147,12 @@ public class PointInfoJob implements Runnable{
                     dmsGateWayListVo.setDeviceList(deviceList);
                     gatewayList.add(dmsGateWayListVo);
 
-                }
 
 
+                });
+                gatewayApiService.dmsGateWayUpdatePost(dmsGateWayUpdateVo);
+            }
 
-            });
-            gatewayApiService.dmsGateWayUpdatePost(dmsGateWayUpdateVo);
 
         });
 

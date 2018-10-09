@@ -1,5 +1,6 @@
 package cn.enncloud.iot.iotgatewaymodbus.netty;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,21 @@ public class OutBoundHandler extends ChannelOutboundHandlerAdapter {
 
             String myflag = TCPServerNetty.bytesToHexString(bytesWrite);
             String[] myarray = myflag.split(" ");
+            if(bytesWrite.length==1){
+                ByteBuf buf = ctx.alloc().buffer(bytesWrite.length);
+
+
+                logger.info("向设备下发的信息为："+TCPServerNetty.bytesToHexString(bytesWrite));
+                buf.writeBytes(bytesWrite);
+                ctx.writeAndFlush(buf).addListener(new ChannelFutureListener(){
+                    @Override
+                    public void operationComplete(ChannelFuture future)
+                            throws Exception {
+                        logger.info("下发成功！");
+                    }
+                });
+            }
+
 //            if(myarray[1].equalsIgnoreCase("73")){
 //                ByteBuf buf = ctx.alloc().buffer(bytesWrite.length);
 //                logger.info("向设备下发的信息为："+TCPServerNetty.bytesToHexString(bytesWrite));
