@@ -116,7 +116,7 @@ public class PointInfoJob implements Runnable{
                     ReadUpInfo readUpInfo=null;
                     IotMessage kafkaData=null;
                     while (System.currentTimeMillis() - startTime <20*1000){
-                        byte[] bytesRec = TCPServerNetty.getMessageMap().get(dmsGatewayEntity.getSerialNum());
+                        byte[] bytesRec = TCPServerNetty.getMessageMap().get(dmsDeviceEntity.getId());
                         if(bytesRec != null ){
 
                             try {
