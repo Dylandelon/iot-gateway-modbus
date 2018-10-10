@@ -4,9 +4,8 @@ import cn.enncloud.iot.iotgatewaymodbus.http.constants.NettyChannelMap;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DeviceInfo;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DmsDeviceEntity;
 import cn.enncloud.iot.iotgatewaymodbus.http.tools.Tool;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
@@ -36,7 +35,7 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
         //删除Channel Map中的失效Client
 //        TCPServerNetty.getMap().remove(getIPString(ctx));
         NettyChannelMap.remove((SocketChannel)ctx.channel());
-//        ctx.close();
+        ctx.close();
     }
 
     @Override
@@ -58,9 +57,21 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
 //        logger.info("根据地址域生成的Key为：" + str1);
 
         if(msg.length==1){
-            ctx.channel().write(msg);
+            ByteBuf buf = ctx.alloc().buffer(msg.length);
+
+
+            logger.info("向设备下发的信息为："+TCPServerNetty.bytesToHexString(msg));
+            buf.writeBytes(msg);
+            ctx.writeAndFlush(buf).addListener(new ChannelFutureListener(){
+                @Override
+                public void operationComplete(ChannelFuture future)
+                        throws Exception {
+                    logger.info("心跳下发成功！");
+                }
+            });
+//            ctx.channel().write(msg);
         }else{
-            AttributeKey<DmsDeviceEntity> attributeKey = AttributeKey.valueOf("DmsDeviceEntity");
+            AttributeKey<DmsDeviceEntity> attributeKey = AttributeKey.valueOf("dmsDeviceEntity");
             DmsDeviceEntity dmsDeviceEntity = ctx.channel().attr(attributeKey).get();
             if(dmsDeviceEntity ==null){
 //            byte[] addressDomain = new byte[5];
@@ -70,7 +81,7 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
                 logger.info("根据注册信息解析手机号：" + Tool.getMobileNO(new String(msg,"utf-8")));
 //                TCPServerNetty.getMap().put(Tool.getMobileNO(new String(msg,"utf-8")), ctx);
                 NettyChannelMap.add((Tool.getMobileNO(new String(msg,"utf-8"))),(SocketChannel)ctx.channel());
-                ctx.channel().write(msg);
+//                ctx.channel().write(msg);
             }else{
                 logger.info("来自设备的信息2：" + TCPServerNetty.bytesToHexStringCompact(msg));
 
@@ -80,7 +91,7 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
 
                 logger.info("上述消息是从设备采集到的消息！");
                 TCPServerNetty.getMessageMap().put(dmsDeviceEntity.getId(), bytesTemp);
-                ctx.channel().write(bytesTemp);
+//                ctx.channel().write(bytesTemp);
             }
         }
 

@@ -17,19 +17,19 @@ public class OutBoundHandler extends ChannelOutboundHandlerAdapter {
         if (msg instanceof byte[]) {
             byte[] bytesWrite = (byte[])msg;
 
-            String myflag = TCPServerNetty.bytesToHexString(bytesWrite);
-            String[] myarray = myflag.split(" ");
-            if(bytesWrite.length==1){
+//            String myflag = TCPServerNetty.bytesToHexString(bytesWrite);
+//            String[] myarray = myflag.split(" ");
+            if(bytesWrite.length>1){
                 ByteBuf buf = ctx.alloc().buffer(bytesWrite.length);
 
 
-                logger.info("向设备下发的信息为："+TCPServerNetty.bytesToHexString(bytesWrite));
+                logger.info("out向设备下发的信息为："+TCPServerNetty.bytesToHexString(bytesWrite));
                 buf.writeBytes(bytesWrite);
                 ctx.writeAndFlush(buf).addListener(new ChannelFutureListener(){
                     @Override
                     public void operationComplete(ChannelFuture future)
                             throws Exception {
-                        logger.info("下发成功！");
+                        logger.info("out下发成功！"+TCPServerNetty.bytesToHexString(bytesWrite));
                     }
                 });
             }

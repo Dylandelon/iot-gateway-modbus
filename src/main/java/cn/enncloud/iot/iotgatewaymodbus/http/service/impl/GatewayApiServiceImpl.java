@@ -252,7 +252,7 @@ public class GatewayApiServiceImpl implements GatewayApiService {
 
 
         } catch (Exception ex) {
-            log.error("aaaaaa");
+            log.error("获取HPS网关信息失败");
 //            log.error(messageSource.getMessage(
 //                    LogKeyConst.LOG_META_ERROR_212,
 //                    new Object[]{System.currentTimeMillis() - beginTime, serialNum, JsonUtils.writeValueAsString(dataRespBody)},

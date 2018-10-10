@@ -21,4 +21,12 @@ public class NettyChannelMap {
             }
         }
     }
+    public static boolean has(SocketChannel socketChannel){
+        for (Map.Entry entry:map.entrySet()){
+            if (entry.getValue()==socketChannel){
+                return true;
+            }
+        }
+        return false;
+    }
 }

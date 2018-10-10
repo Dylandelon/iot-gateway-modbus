@@ -22,6 +22,8 @@ import cn.enncloud.iot.iotgatewaymodbus.http.vo.dto.DmsGateWayListVo;
 import cn.enncloud.iot.iotgatewaymodbus.http.vo.dto.DmsGateWayUpdateVo;
 import cn.enncloud.iot.iotgatewaymodbus.netty.TCPServerNetty;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.util.AttributeKey;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,7 +113,13 @@ public class PointInfoJob implements Runnable{
                  ;
                     AttributeKey<DmsDeviceEntity> attributeKey = AttributeKey.valueOf("dmsDeviceEntity");
                     channel.attr(attributeKey).set(dmsDeviceEntity);
-                    channel.writeAndFlush(bytesWriteSec);
+                    channel.writeAndFlush(bytesWriteSec).addListener(new ChannelFutureListener(){
+                        @Override
+                        public void operationComplete(ChannelFuture future)
+                                throws Exception {
+                            log.info("job下发成功！"+TCPServerNetty.bytesToHexString(bytesWrite));
+                        }
+                    });
                     long startTime = System.currentTimeMillis();
                     ReadUpInfo readUpInfo=null;
                     IotMessage kafkaData=null;
