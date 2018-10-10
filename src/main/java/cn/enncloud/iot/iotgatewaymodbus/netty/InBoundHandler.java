@@ -1,11 +1,13 @@
 package cn.enncloud.iot.iotgatewaymodbus.netty;
 
+import cn.enncloud.iot.iotgatewaymodbus.http.constants.NettyChannelMap;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DeviceInfo;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DmsDeviceEntity;
 import cn.enncloud.iot.iotgatewaymodbus.http.tools.Tool;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.AttributeKey;
@@ -32,8 +34,9 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         //删除Channel Map中的失效Client
-        TCPServerNetty.getMap().remove(getIPString(ctx));
-        ctx.close();
+//        TCPServerNetty.getMap().remove(getIPString(ctx));
+        NettyChannelMap.remove((SocketChannel)ctx.channel());
+//        ctx.close();
     }
 
     @Override
@@ -65,7 +68,8 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
 //            String str1 = getKeyFromArray(addressDomain); //生成key
 //            logger.info("根据地址域生成的Key为：" + str1);
                 logger.info("根据注册信息解析手机号：" + Tool.getMobileNO(new String(msg,"utf-8")));
-                TCPServerNetty.getMap().put(Tool.getMobileNO(new String(msg,"utf-8")), ctx);
+//                TCPServerNetty.getMap().put(Tool.getMobileNO(new String(msg,"utf-8")), ctx);
+                NettyChannelMap.add((Tool.getMobileNO(new String(msg,"utf-8"))),(SocketChannel)ctx.channel());
                 ctx.channel().write(msg);
             }else{
                 logger.info("来自设备的信息2：" + TCPServerNetty.bytesToHexStringCompact(msg));

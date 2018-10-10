@@ -1,5 +1,6 @@
 package cn.enncloud.iot.iotgatewaymodbus.http.controller;
 
+import cn.enncloud.iot.iotgatewaymodbus.http.constants.NettyChannelMap;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DeviceInfo;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DmsGatewayEntity;
 import cn.enncloud.iot.iotgatewaymodbus.http.tools.CRC16;
@@ -13,7 +14,9 @@ import cn.enncloud.iot.iotgatewaymodbus.http.tools.Tool;
 import cn.enncloud.iot.iotgatewaymodbus.http.tools.ValidatorTools;
 import cn.enncloud.iot.iotgatewaymodbus.http.vo.dto.DmsGateWayDevicControlVo;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.socket.SocketChannel;
 import io.netty.util.AttributeKey;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.BeanUtils;
@@ -89,7 +92,7 @@ public class CommandController {
 //
 //            ch.getValue().writeAndFlush(CRC16.addCRC(bytesWrite4));
 //        });
-        ChannelHandlerContext  channel = TCPServerNetty.getMap().get(dmsGatewayEntityList.get(0).getSerialNum());
+        Channel channel = NettyChannelMap.get(dmsGatewayEntityList.get(0).getSerialNum());
 //        AttributeKey<String> attributeKey = AttributeKey.valueOf("deviceInfoList");
 //        channel.channel().attr(attributeKey).set("aaaabbbb");
 //        ByteBuf buf = ChannelHandlerContext.alloc().buffer(bytesWrite2.length);

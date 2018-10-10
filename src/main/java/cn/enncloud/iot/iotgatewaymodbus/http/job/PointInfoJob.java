@@ -6,6 +6,7 @@ import cn.enncloud.iot.iotgatewaymodbus.http.configration.MsgPack;
 import cn.enncloud.iot.iotgatewaymodbus.http.configration.ReadUpInfo;
 import cn.enncloud.iot.iotgatewaymodbus.http.constants.Constant;
 import cn.enncloud.iot.iotgatewaymodbus.http.constants.Constants;
+import cn.enncloud.iot.iotgatewaymodbus.http.constants.NettyChannelMap;
 import cn.enncloud.iot.iotgatewaymodbus.http.data.IotDevice;
 import cn.enncloud.iot.iotgatewaymodbus.http.data.IotHeader;
 import cn.enncloud.iot.iotgatewaymodbus.http.data.IotMessage;
@@ -20,7 +21,7 @@ import cn.enncloud.iot.iotgatewaymodbus.http.vo.dto.DmsDeviceListVo;
 import cn.enncloud.iot.iotgatewaymodbus.http.vo.dto.DmsGateWayListVo;
 import cn.enncloud.iot.iotgatewaymodbus.http.vo.dto.DmsGateWayUpdateVo;
 import cn.enncloud.iot.iotgatewaymodbus.netty.TCPServerNetty;
-import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +69,7 @@ public class PointInfoJob implements Runnable{
 
         dmsGatewayEntityList.forEach(dmsGatewayEntity -> {
             // 根据网关获取channel
-            ChannelHandlerContext channel = TCPServerNetty.getMap().get(dmsGatewayEntity.getSerialNum());
+            Channel channel = NettyChannelMap.get(dmsGatewayEntity.getSerialNum());
             if(channel == null){
                 log.info("网关没有注册："+dmsGatewayEntity.getSerialNum());
             }else{
@@ -109,7 +110,7 @@ public class PointInfoJob implements Runnable{
                     log.info("向设备下发的信息加密为："+TCPServerNetty.bytesToHexString(bytesWriteSec));
                  ;
                     AttributeKey<DmsDeviceEntity> attributeKey = AttributeKey.valueOf("dmsDeviceEntity");
-                    channel.channel().attr(attributeKey).set(dmsDeviceEntity);
+                    channel.attr(attributeKey).set(dmsDeviceEntity);
                     channel.writeAndFlush(bytesWriteSec);
                     long startTime = System.currentTimeMillis();
                     ReadUpInfo readUpInfo=null;

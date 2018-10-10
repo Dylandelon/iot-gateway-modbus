@@ -7,6 +7,7 @@ import java.util.List;
 
 public class DmsGateWayUpdateVo {
 
+    public static final String OBJECT_KEY = "DMS_GATEWAY_UPDATE_VO";
     private Integer id;
 
     private String type;
@@ -76,6 +77,13 @@ public class DmsGateWayUpdateVo {
 
     public void setGatewayList(List<DmsGateWayListVo> gatewayList) {
         this.gatewayList = gatewayList;
+    }
+    public Integer getKey() {
+        return getId();
+    }
+
+    public String getObjectKey() {
+        return OBJECT_KEY;
     }
 
     @Override
