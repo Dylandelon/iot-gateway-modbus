@@ -103,7 +103,9 @@ public class PointInfoJob implements Runnable{
 
                     // 采集数据命令下发
 //                CmdMsg cmdMsg = new CmdMsg(1,"PAs","0");
-                    MsgPack msgPack = ModbusProto.getDownProtocolCmdDTO(dmsDeviceEntity,dmsProtocolPointModbusEntityList);
+//                    MsgPack msgPack = ModbusProto.getDownProtocolCmdDTO(dmsDeviceEntity,dmsProtocolPointModbusEntityList);
+                    DevPonitCtr dPCtr = new DevPonitCtr();
+                    MsgPack msgPack = ModbusProto.getDownProtocolDTO(dmsDeviceEntity,dPCtr,dmsProtocolPointModbusEntityList);
                     byte[] onepa = ModbusProto.getBytesBuf(msgPack);
                     byte[] bytesWrite = CRC16.addCRC(onepa);
                     log.info("向设备下发的信息未加密为："+TCPServerNetty.bytesToHexString(bytesWrite));
