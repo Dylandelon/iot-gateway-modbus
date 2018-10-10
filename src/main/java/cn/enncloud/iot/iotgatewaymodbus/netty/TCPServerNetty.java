@@ -35,6 +35,10 @@ public class TCPServerNetty {
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .option(ChannelOption.SO_BACKLOG, 128)
+                    //通过NoDelay禁用Nagle,使消息立即发出去，不用等待到一定的数据量才发出去
+                    .option(ChannelOption.TCP_NODELAY, true)
+                    //保持长连接状态
+                    .childOption(ChannelOption.SO_KEEPALIVE, true)
 //                    .option(ChannelOption.TCP_NODELAY, true)
 //                    .childOption(ChannelOption.SO_KEEPALIVE, true)
                     .handler(new LoggingHandler(LogLevel.INFO))
