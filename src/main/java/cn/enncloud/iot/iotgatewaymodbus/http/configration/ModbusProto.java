@@ -4,14 +4,18 @@ package cn.enncloud.iot.iotgatewaymodbus.http.configration;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DmsDeviceEntity;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DmsProtocolPointModbusEntity;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.ModbusCMDGroupPackages;
+import lombok.extern.log4j.Log4j;
 import org.springframework.util.StringUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * Created by Thinkpad on 2018/9/27.
  */
+@Log4j
 public class ModbusProto {
     public static byte[] getBytesBuf(MsgPack msgPack) {
         byte[] datbytes=null;
@@ -202,131 +206,202 @@ public class ModbusProto {
         });
         return dmsProtocolPointModbusEntityList;
     }
-    public static String convertModbusValue(byte[] data,int offset,int AlignType,String DataFormat,int registerLength)
-    {
-        String result=null;
+    public static String convertModbusValue(byte[] data, int offset, int AlignType, String DataFormat, int registerLength) {
+        String result = null;
         int value;
-        if(DataFormat.toUpperCase().equals("FLOAT"))
-        {
-            if(registerLength==1)
-            {
-                if(AlignType==1)
-                {
-                    value=data[offset+0]*256+data[offset+1];
-                    result=String.format("%d",value);
-                }else
-                {
-                    value=data[offset+0]*256+data[offset+1];
-                    result=String.format("%d",value);
+        if (DataFormat.toUpperCase().equals("FLOAT")) {
+            if (registerLength == 1) {
+                if (AlignType == 1) {
+                    value = data[offset + 0] * 256 + data[offset + 1];
+                    result = String.format("%d", value);
+                } else {
+                    value = data[offset + 0] * 256 + data[offset + 1];
+                    result = String.format("%d", value);
                 }
-            }else if(registerLength==2)
-            {
-                if(AlignType==1)
-                {
-                    value=data[offset+0]*256*256*256+data[offset+1]*256*256+data[offset+2]*256+data[offset+3];
-                    result=String.format("%d",value);
-                }else {
-                    value=data[offset+0]*256*256*256+data[offset+1]*256*256+data[offset+2]*256+data[offset+3];
-                    result=String.format("%d",value);
+            } else if (registerLength == 2) {
+                if (AlignType == 1) {
+                    value = data[offset + 0] * 256 * 256 * 256 + data[offset + 1] * 256 * 256 + data[offset + 2] * 256 + data[offset + 3];
+                    result = String.format("%d", value);
+                } else {
+                    value = data[offset + 0] * 256 * 256 * 256 + data[offset + 1] * 256 * 256 + data[offset + 2] * 256 + data[offset + 3];
+                    result = String.format("%d", value);
                 }
-            }else
-            {
-                value=data[offset+0]*256+data[offset+1];
-                result=String.format("%d",value);
+            } else {
+                value = data[offset + 0] * 256 + data[offset + 1];
+                result = String.format("%d", value);
             }
-        }else
-        {
-            if(registerLength==1)
-            {
-                if(AlignType==1)
-                {
-                    value=data[offset+0]*256+data[offset+1];
-                    result=String.format("%d",value);
-                }else
-                {
-                    value=data[offset+0]*256+data[offset+1];
-                    result=String.format("%d",value);
+        } else {
+            if (registerLength == 1) {
+                if (AlignType == 1) {
+                    value = data[offset + 0] * 256 + data[offset + 1];
+                    result = String.format("%d", value);
+                } else {
+                    value = data[offset + 0] * 256 + data[offset + 1];
+                    result = String.format("%d", value);
                 }
-            }else if(registerLength==2)
-            {
-                if(AlignType==1)
-                {
-                    value=data[offset+0]*256*256*256+data[offset+1]*256*256+data[offset+2]*256+data[offset+3];
-                    result=String.format("%d",value);
-                }else {
-                    value=data[offset+0]*256*256*256+data[offset+1]*256*256+data[offset+2]*256+data[offset+3];
-                    result=String.format("%d",value);
+            } else if (registerLength == 2) {
+                if (AlignType == 1) {
+                    value = data[offset + 0] * 256 * 256 * 256 + data[offset + 1] * 256 * 256 + data[offset + 2] * 256 + data[offset + 3];
+                    result = String.format("%d", value);
+                } else {
+                    value = data[offset + 0] * 256 * 256 * 256 + data[offset + 1] * 256 * 256 + data[offset + 2] * 256 + data[offset + 3];
+                    result = String.format("%d", value);
                 }
-            }else
-            {
-                value=data[offset+0]*256+data[offset+1];
-                result=String.format("%d",value);
+            } else {
+                value = data[offset + 0] * 256 + data[offset + 1];
+                result = String.format("%d", value);
             }
         }
         return result;
     }
-    public static float convertModbusValue_RetFloat(byte[] data,int offset,int AlignType,String DataFormat,int registerLength)
-    {
-        float result=0;
+
+    public static float convertModbusValue_RetFloat(String name,byte[] data, int offset, int AlignType, String DataFormat, int registerLength) {
+        float result = 0;
         int value;
-        if(DataFormat.toUpperCase().equals("FLOAT"))
-        {
-            if(registerLength==1)
-            {
-                if(AlignType==1)
-                {
-                    value=data[offset+0]*256+data[offset+1];
-                    result=(float)value;
-                }else
-                {
-                    value=data[offset+0]*256+data[offset+1];
-                    result=(float)value;
+        if (DataFormat.toUpperCase().equals("FLOAT")) {
+            if (registerLength == 1) {
+                if (AlignType == 1) {
+                    result=ModbusByteToFloat(name,data,offset,AlignType,registerLength*2);
+                } else {
+                    result=ModbusByteToFloat(name,data,offset,AlignType,registerLength*2);
                 }
-            }else if(registerLength==2)
-            {
-                if(AlignType==1)
-                {
-                    value=data[offset+0]*256*256*256+data[offset+1]*256*256+data[offset+2]*256+data[offset+3];
-                    result=(float)value;
-                }else {
-                    value=data[offset+0]*256*256*256+data[offset+1]*256*256+data[offset+2]*256+data[offset+3];
-                    result=(float)value;
+            } else if (registerLength == 2) {
+                if (AlignType == 1) {
+                    result=ModbusByteToFloat(name,data,offset,AlignType,registerLength*2);
+                } else {
+                    result=ModbusByteToFloat(name,data,offset,AlignType,registerLength*2);
                 }
-            }else
-            {
-                value=data[offset+0]*256+data[offset+1];
-                result=(float)value;
+            } else {
+                result=ModbusByteToFloat(name,data,offset,AlignType,registerLength*2);
             }
-        }else
-        {
-            if(registerLength==1)
-            {
-                if(AlignType==1)
-                {
-                    value=data[offset+0]*256+data[offset+1];
-                    result=(float)value;
-                }else
-                {
-                    value=data[offset+0]*256+data[offset+1];
-                    result=(float)value;
+        } else {
+            if (registerLength == 1) {
+                if (AlignType == 1) {
+                    value = get256_n(data[offset + 0],1)  + get256_n(data[offset + 1],0);
+                    result = (float) value;
+                } else {
+                    value = get256_n(data[offset + 0],1)  + get256_n(data[offset + 1],0);
+                    result = (float) value;
                 }
-            }else if(registerLength==2)
-            {
-                if(AlignType==1)
-                {
-                    value=data[offset+0]*256*256*256+data[offset+1]*256*256+data[offset+2]*256+data[offset+3];
-                    result=(float)value;
-                }else {
-                    value=data[offset+0]*256*256*256+data[offset+1]*256*256+data[offset+2]*256+data[offset+3];
-                    result=(float)value;
+            } else if (registerLength == 2) {
+                if (AlignType == 1) {
+                    value = get256_n(data[offset + 0],3)  + get256_n(data[offset + 1],2)  + get256_n(data[offset + 2],1)  + get256_n(data[offset + 3],0);
+                    result = (float) value;
+                } else {
+                    value = get256_n(data[offset + 0],3)  + get256_n(data[offset + 1],2)  + get256_n(data[offset + 2],1)  + get256_n(data[offset + 3],0);
+                    result = (float) value;
                 }
-            }else
-            {
-                value=data[offset+0]*256+data[offset+1];
-                result=(float)value;
+            } else if (registerLength == 4) {
+                if (AlignType == 1) {
+                    value = get256_n(data[offset + 0],7)  + get256_n(data[offset + 1],6)  + get256_n(data[offset + 2],5)  + get256_n(data[offset + 3],4)+
+                            get256_n(data[offset + 4],3)  + get256_n(data[offset + 5],2)  + get256_n(data[offset + 6],1)  + get256_n(data[offset + 7],0);
+                    result = (float) value;
+                } else {
+                    value = get256_n(data[offset + 0],7)  + get256_n(data[offset + 1],6)  + get256_n(data[offset + 2],5)  + get256_n(data[offset + 3],4)+
+                            get256_n(data[offset + 4],3)  + get256_n(data[offset + 5],2)  + get256_n(data[offset + 6],1)  + get256_n(data[offset + 7],0);
+                    result = (float) value;
+                }
+            } else {
+                value = getint(data[offset + 0]) * 256 + getint(data[offset + 1]);
+                result = (float) value;
             }
         }
         return result;
+    }
+    static  int get256_n(byte data,int pow)
+    {
+        double i=java.lang.Math.pow(256, pow);
+        double data1=getint(data)*i;
+        int intdata=(int)data1;
+        return intdata;
+    }
+    static  int getint(byte data)
+    {
+        int i = data;
+        i = data&0xff;
+        return i;
+    }
+    static  float ModbusByteToFloat(String Name,byte[] datas,int offset,int AlignType,int num) {
+        if(num>4)
+            num=4;
+        float retdata=0;
+        float retdata1=0;
+        float retdata2=0;
+        float retdata3=0;
+        if(num<2)
+            return retdata;
+        byte[] bytes=new byte[4];
+        byte[] bytes1=new byte[4];
+        byte[] bytes2=new byte[4];
+        byte[] bytes3=new byte[4];
+
+
+        //if(AlignType==2) //大端2
+        //{
+        //bytes[num-1-i]=datas[offset+i];//小端
+        bytes[0]=datas[offset+1];
+        bytes[1]=datas[offset+0];
+        bytes[2]=datas[offset+3];
+        bytes[3]=datas[offset+2];
+        //  }else {
+        bytes1[0]=datas[offset+0];
+        bytes1[1]=datas[offset+1];
+        bytes1[2]=datas[offset+2];
+        bytes1[3]=datas[offset+3];
+        //}
+        bytes2[0]=datas[offset+2];
+        bytes2[1]=datas[offset+3];
+        bytes2[2]=datas[offset+0];
+        bytes2[3]=datas[offset+1];
+
+        bytes3[0]=datas[offset+3];
+        bytes3[1]=datas[offset+2];
+        bytes3[2]=datas[offset+1];
+        bytes3[3]=datas[offset+0];
+
+        //再将bais 封装为DataInputStream类型
+        try {
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+            DataInputStream dis = new DataInputStream(bais);
+            retdata= dis.readFloat();
+            dis.close();
+        } catch (Exception ex)
+        {
+
+        }
+        try {
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes1);
+            DataInputStream dis = new DataInputStream(bais);
+            retdata1= dis.readFloat();
+            dis.close();
+        } catch (Exception ex)
+        {
+
+        }
+        try {
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes2);
+            DataInputStream dis = new DataInputStream(bais);
+            retdata2= dis.readFloat();
+            dis.close();
+        } catch (Exception ex)
+        {
+
+        }
+        try {
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes3);
+            DataInputStream dis = new DataInputStream(bais);
+            retdata3= dis.readFloat();
+            dis.close();
+        } catch (Exception ex)
+        {
+
+        }
+        log.info(String.format(Name+"  AlignType=%d:(1)%f (2)%f (3)%f (4)%f",AlignType,retdata,retdata1,retdata2,retdata3));
+        if(AlignType==0)
+            retdata=retdata2;
+        else
+            retdata=retdata1;
+        return retdata;
     }
     public static ReadUpInfo getUpProtocolDTO(MsgPack msgPack, byte[] revdata, int len, List<DmsProtocolPointModbusEntity>  pointDTO, String secretKey) {
         if(pointDTO==null)
@@ -372,7 +447,7 @@ public class ModbusProto {
                         int AlignType=info.getAlignType();
                         String DataFormat=info.getDataFormat();
                         int registerLength=info.getRegisterLen();
-                        float value=convertModbusValue_RetFloat(revdata,bufoffset,AlignType,DataFormat,registerLength);
+                        float value=convertModbusValue_RetFloat(info.getDmsPointName(),revdata,bufoffset,AlignType,DataFormat,registerLength);
                         data.put(info.getDmsPointName(),value);
                     }
                 }
@@ -516,7 +591,7 @@ public class ModbusProto {
                         int AlignType=info.getAlignType();
                         String DataFormat=info.getDataFormat();
                         int registerLength=info.getRegisterLen();
-                        float value=convertModbusValue_RetFloat(revdata,bufoffset,AlignType,DataFormat,registerLength);
+                        float value=convertModbusValue_RetFloat(info.getDmsPointName(),revdata,bufoffset,AlignType,DataFormat,registerLength);
                         data.put(info.getDmsPointName(),value);
                     }
                 }
