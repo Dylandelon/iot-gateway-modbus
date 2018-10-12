@@ -53,11 +53,7 @@ public class ModbusProto {
             msgPack.startAddress=info.getRegisterAddress();
             msgPack.registerNum=info.getRegisterLen();
             //msgPack.value=cmdMsg.value
-            if(info.getRemark() == null || StringUtils.isEmpty(info.getRemark())){
-                msgPack.funCode=3;
-            }else{
-                msgPack.funCode=Byte.parseByte(info.getRemark().trim());
-            }
+            msgPack.funCode=(byte)info.getRegType();
 
         }
         return msgPack;
@@ -165,11 +161,7 @@ public class ModbusProto {
             DmsProtocolPointModbusEntity info=dmsProtocolPointModbusEntityList.get(i);
             int code=3;
             try{
-                if(info.getRemark() == null || StringUtils.isEmpty(info.getRemark())){
-                    code=3;
-                }else{
-                    code=Byte.parseByte(info.getRemark().trim());
-                }
+                code = info.getRegType();
 //                code=Integer.parseInt(info.getRemark().trim());
             }catch (Exception ex)
             {
@@ -431,12 +423,7 @@ public class ModbusProto {
                 {
                     DmsProtocolPointModbusEntity info=pointInfoList.get(i);
                     int funcode=0x3;
-                    try {
-                        funcode=Integer.parseInt(info.getRemark());
-                    }catch (Exception ex)
-                    {
-
-                    }
+                    funcode = info.getRegType();
                     if(funcode!=msgPack.funCode)
                         continue;
                     int regaddr=info.getRegisterAddress();
@@ -463,12 +450,7 @@ public class ModbusProto {
                 {
                     DmsProtocolPointModbusEntity info=pointInfoList.get(i);
                     int funcode=0x3;
-                    try {
-                        funcode=Integer.parseInt(info.getRemark());
-                    }catch (Exception ex)
-                    {
-
-                    }
+                    funcode=info.getRegType();
                     if(funcode!=msgPack.funCode)
                         continue;
                     int regaddr=info.getRegisterAddress();
@@ -508,15 +490,15 @@ public class ModbusProto {
         // List<DmsProtocolPointModbusEntity> 升序排列
 
         List<ModbusCMDGroupPackages> modbusCMDGroupPackagesList = new ArrayList<>();
-        pointDTO.forEach(dmsProtocolPointModbusEntity -> {
-            if(StringUtils.isEmpty(dmsProtocolPointModbusEntity.getRemark())){
-                dmsProtocolPointModbusEntity.setRemark("3");
-            }});
+//        pointDTO.forEach(dmsProtocolPointModbusEntity -> {
+//            if(StringUtils.isEmpty(dmsProtocolPointModbusEntity.getRemark())){
+//                dmsProtocolPointModbusEntity.setRemark("3");
+//            }});
 
         // 按照功能码分组
-        Map<String,List<DmsProtocolPointModbusEntity>> dmsProtocolPointModbusEntityMap =
+        Map<Integer,List<DmsProtocolPointModbusEntity>> dmsProtocolPointModbusEntityMap =
                 pointDTO.stream().sorted(Comparator.comparing(DmsProtocolPointModbusEntity::getRegisterAddress))
-                .collect(Collectors.groupingBy(DmsProtocolPointModbusEntity::getRemark));
+                .collect(Collectors.groupingBy(DmsProtocolPointModbusEntity::getRegType));
 
 
         // 每40地址区间生成一个命令
@@ -528,8 +510,8 @@ public class ModbusProto {
 //            int packgeSize = (int)Math.ceil((double)(v.get(v.size()).getRegisterAddress()-v.get(0).getRegisterAddress()+v.get(v.size()).getRegisterLen())/40);
             int packgeSize = (int)Math.ceil((double)(v.size()/40));
             List<List<DmsProtocolPointModbusEntity>> groupPackages = new ArrayList<>();
-            for (int i = 0; i < packgeSize; i++) {
-                if(i==v.size()-1){
+            for (int i = 0; i < (packgeSize+1); i++) {
+                if(i==packgeSize){
                     groupPackages.add(v.subList(i * 40, v.size()));
                 }else{
                     groupPackages.add(v.subList(i * 40,(i+1)*40));
@@ -538,7 +520,7 @@ public class ModbusProto {
             }
             groupPackages.forEach(dmsProtocolPointModbusEntities -> {
                 msgPack.startAddress=dmsProtocolPointModbusEntities.get(0).getRegisterAddress();
-                msgPack.registerNum=dmsProtocolPointModbusEntities.get(dmsProtocolPointModbusEntities.size()).getRegisterAddress()-msgPack.startAddress+dmsProtocolPointModbusEntities.get(dmsProtocolPointModbusEntities.size()).getRegisterAddress();
+                msgPack.registerNum=dmsProtocolPointModbusEntities.get(dmsProtocolPointModbusEntities.size()-1).getRegisterAddress()-msgPack.startAddress+dmsProtocolPointModbusEntities.get(dmsProtocolPointModbusEntities.size()-1).getRegisterLen();
                 ModbusCMDGroupPackages modbusCMDGroupPackages = new ModbusCMDGroupPackages();
                 modbusCMDGroupPackages.setMsgPack(msgPack);
                 modbusCMDGroupPackages.setDmsProtocolPointModbusEntityList(dmsProtocolPointModbusEntities);
@@ -576,7 +558,7 @@ public class ModbusProto {
                     DmsProtocolPointModbusEntity info=pointInfoList.get(i);
                     int funcode=0x3;
                     try {
-                        funcode=Integer.parseInt(info.getRemark());
+                        funcode=info.getRegType();
                     }catch (Exception ex)
                     {
 
@@ -608,7 +590,7 @@ public class ModbusProto {
                     DmsProtocolPointModbusEntity info=pointInfoList.get(i);
                     int funcode=0x3;
                     try {
-                        funcode=Integer.parseInt(info.getRemark());
+                        funcode=info.getRegType();
                     }catch (Exception ex)
                     {
 

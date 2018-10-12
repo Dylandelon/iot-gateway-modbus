@@ -30,6 +30,7 @@ import io.netty.util.AttributeKey;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
 import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
@@ -62,6 +63,8 @@ public class PointInfoJob implements Runnable{
     private MessageChannel output;
     @Autowired
     private Environment environment;
+    @Autowired
+    private BinderAwareChannelResolver resolver;
 
 
 
@@ -157,6 +160,7 @@ public class PointInfoJob implements Runnable{
 
 //                log.error("uuid:,发送kafka错误!入参:{}", JsonUtils.writeValueAsString(kafkaData));
                                 }
+                                channel.attr(attributeKey2).remove();
                             }
                         }
                     });
