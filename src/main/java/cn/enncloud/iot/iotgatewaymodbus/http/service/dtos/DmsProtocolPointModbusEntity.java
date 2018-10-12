@@ -38,6 +38,9 @@ public class DmsProtocolPointModbusEntity {
     private int registerAddress;
     private int registerLen;
     private String remark;
+    private int regType=0;
+    private int rwFlag=0;
+    private String adjOffset;
 
     private String dmsPointName;
 
