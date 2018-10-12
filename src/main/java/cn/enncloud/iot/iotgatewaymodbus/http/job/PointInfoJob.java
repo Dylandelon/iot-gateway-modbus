@@ -161,6 +161,7 @@ public class PointInfoJob implements Runnable{
 //                log.error("uuid:,发送kafka错误!入参:{}", JsonUtils.writeValueAsString(kafkaData));
                                 }
                                 channel.attr(attributeKey2).remove();
+                                TCPServerNetty.getMessageMap().remove((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress());
                             }
                         }
                     });
