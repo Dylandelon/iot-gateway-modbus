@@ -65,7 +65,7 @@ public interface DmsGatewayService {
     @RequestMapping(value = "/dmsXinao3761ProtocolPoint", method = RequestMethod.GET)
     DataRespBody dmsXinao3761ProtocolPoint(@RequestParam(value = "protocolTypeId", required = false) Long protocolTypeId) throws Exception;
 
-    @RequestMapping(value = "/meta/dmsGateWayUpdate",method = RequestMethod.POST,consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/meta/dmsGateWayUpdate",method = RequestMethod.POST)
     DataRespBody dmsGateWayUpdatePost(@RequestBody DmsGateWayUpdateVo entity) throws Exception;
 
 }

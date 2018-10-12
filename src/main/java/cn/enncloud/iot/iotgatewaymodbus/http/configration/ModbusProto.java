@@ -3,10 +3,11 @@ package cn.enncloud.iot.iotgatewaymodbus.http.configration;
 
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DmsDeviceEntity;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DmsProtocolPointModbusEntity;
-import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.ModbusPointInfo;
+import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.ModbusCMDGroupPackages;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Thinkpad on 2018/9/27.
@@ -344,6 +345,150 @@ public class ModbusProto {
             readUpInfo.setFunctionCode(String.format("%x",msgPack.funCode));
             readUpInfo.setAddress(msgPack.devAddress);
             List<DmsProtocolPointModbusEntity> pointInfoList = pointInfoListSort(pointDTO);
+            if( msgPack.funCode==0x03||msgPack.funCode==0x04){
+                int sum=revdata[2]&0xff; //无符号赋值有符号
+                readUpInfo.setByteNum(sum);
+                int regsum=sum/2;
+                int endAddr=msgPack.startAddress+regsum-1;
+                int bufoffset=3;
+                int regindex=0;
+                for(int i=0;i<pointInfoList.size();i++)
+                {
+                    DmsProtocolPointModbusEntity info=pointInfoList.get(i);
+                    int funcode=0x3;
+                    try {
+                        funcode=Integer.parseInt(info.getRemark());
+                    }catch (Exception ex)
+                    {
+
+                    }
+                    if(funcode!=msgPack.funCode)
+                        continue;
+                    int regaddr=info.getRegisterAddress();
+                    if(regaddr>=msgPack.startAddress&&
+                            regaddr<=endAddr)
+                    {
+                        bufoffset=(regaddr-msgPack.startAddress)*2+3;
+                        int AlignType=info.getAlignType();
+                        String DataFormat=info.getDataFormat();
+                        int registerLength=info.getRegisterLen();
+                        float value=convertModbusValue_RetFloat(revdata,bufoffset,AlignType,DataFormat,registerLength);
+                        data.put(info.getDmsPointName(),value);
+                    }
+                }
+            }else if(msgPack.funCode==0x01||msgPack.funCode==0x02){
+                //bit位处理
+                int sum=revdata[2]&0xff; //无符号赋值有符号
+                readUpInfo.setByteNum(sum);
+                int regsum=sum*8;
+                int endAddr=msgPack.startAddress+regsum-1;
+                int bufoffset=3;
+                int regindex=0;
+                for(int i=0;i<pointInfoList.size();i++)
+                {
+                    DmsProtocolPointModbusEntity info=pointInfoList.get(i);
+                    int funcode=0x3;
+                    try {
+                        funcode=Integer.parseInt(info.getRemark());
+                    }catch (Exception ex)
+                    {
+
+                    }
+                    if(funcode!=msgPack.funCode)
+                        continue;
+                    int regaddr=info.getRegisterAddress();
+                    int byteoffset=0;
+                    if(regaddr>=msgPack.startAddress&&
+                            regaddr<=endAddr)
+                    {
+                        bufoffset=regaddr/8+3;
+                        byteoffset=(regaddr);
+
+                        int AlignType=info.getAlignType();
+                        String DataFormat=info.getDataFormat();
+                        int registerLength=info.getRegisterLen();
+                        float value=0;
+                        if(((revdata[bufoffset]>>byteoffset)&0x01)>0)
+                        {
+                            value=1;
+                        }else
+                        {
+                            value=0;
+                        }
+                        data.put(info.getDmsPointName(),value);
+
+                    }
+                }
+            } else {
+                int sum=revdata[2]&0xff; //无符号赋值有符号
+                readUpInfo.setByteNum(sum);
+            }
+        }
+        readUpInfo.setData(data);
+        return readUpInfo;
+    }
+
+
+    public static List<ModbusCMDGroupPackages> generateDownProtocol(DmsDeviceEntity deviceInfo,List<DmsProtocolPointModbusEntity> pointDTO) {
+        // List<DmsProtocolPointModbusEntity> 升序排列
+
+        List<ModbusCMDGroupPackages> modbusCMDGroupPackagesList = new ArrayList<>();
+        pointDTO.forEach(dmsProtocolPointModbusEntity -> {
+            if(StringUtils.isEmpty(dmsProtocolPointModbusEntity.getRemark())){
+                dmsProtocolPointModbusEntity.setRemark("3");
+            }});
+
+        // 按照功能码分组
+        Map<String,List<DmsProtocolPointModbusEntity>> dmsProtocolPointModbusEntityMap =
+                pointDTO.stream().sorted(Comparator.comparing(DmsProtocolPointModbusEntity::getRegisterAddress))
+                .collect(Collectors.groupingBy(DmsProtocolPointModbusEntity::getRemark));
+
+
+        // 每40地址区间生成一个命令
+        dmsProtocolPointModbusEntityMap.forEach((k,v)->{
+            MsgPack msgPack=new MsgPack();
+            msgPack.devAddress=(byte)(int)deviceInfo.getSlaveAddress();
+            msgPack.funCode=(byte)(int)Integer.valueOf(k);
+            ;
+//            int packgeSize = (int)Math.ceil((double)(v.get(v.size()).getRegisterAddress()-v.get(0).getRegisterAddress()+v.get(v.size()).getRegisterLen())/40);
+            int packgeSize = (int)Math.ceil((double)(v.size()/40));
+            List<List<DmsProtocolPointModbusEntity>> groupPackages = new ArrayList<>();
+            for (int i = 0; i < packgeSize; i++) {
+                if(i==v.size()-1){
+                    groupPackages.add(v.subList(i * 40, v.size()));
+                }else{
+                    groupPackages.add(v.subList(i * 40,(i+1)*40));
+                }
+
+            }
+            groupPackages.forEach(dmsProtocolPointModbusEntities -> {
+                msgPack.startAddress=dmsProtocolPointModbusEntities.get(0).getRegisterAddress();
+                msgPack.registerNum=dmsProtocolPointModbusEntities.get(dmsProtocolPointModbusEntities.size()).getRegisterAddress()-msgPack.startAddress+dmsProtocolPointModbusEntities.get(dmsProtocolPointModbusEntities.size()).getRegisterAddress();
+                ModbusCMDGroupPackages modbusCMDGroupPackages = new ModbusCMDGroupPackages();
+                modbusCMDGroupPackages.setMsgPack(msgPack);
+                modbusCMDGroupPackages.setDmsProtocolPointModbusEntityList(dmsProtocolPointModbusEntities);
+                modbusCMDGroupPackagesList.add(modbusCMDGroupPackages);
+            });
+
+        });
+
+        return modbusCMDGroupPackagesList;
+    }
+    public static ReadUpInfo analysisUpProtocol(byte[] revdata, int len, ModbusCMDGroupPackages modbusCMDGroupPackages, String secretKey) {
+        if(len<5)
+        {
+            return null;
+        }
+        MsgPack msgPack = modbusCMDGroupPackages.getMsgPack();
+        List<DmsProtocolPointModbusEntity> pointInfoList = modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList();
+
+        ReadUpInfo readUpInfo=new ReadUpInfo();
+        Map<String, Object> data = new HashMap();
+        if(revdata[0]==msgPack.devAddress&&
+                revdata[1]==msgPack.funCode)
+        {
+            readUpInfo.setFunctionCode(String.format("%x",msgPack.funCode));
+            readUpInfo.setAddress(msgPack.devAddress);
             if( msgPack.funCode==0x03||msgPack.funCode==0x04){
                 int sum=revdata[2]&0xff; //无符号赋值有符号
                 readUpInfo.setByteNum(sum);

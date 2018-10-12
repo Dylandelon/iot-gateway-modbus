@@ -12,7 +12,7 @@ public class DmsGateWayUpdateVo {
 
     private String type;
 
-    @JsonFormat(pattern = "yyyy-MM-ddTHH:mm:ss.fff")
+//    @JsonFormat(pattern = "yyyy-MM-ddTHH:mm:ss.fff")
     private LocalDateTime recentOnline;
 
     private String serverName;

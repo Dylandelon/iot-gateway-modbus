@@ -3,6 +3,7 @@ package cn.enncloud.iot.iotgatewaymodbus.netty;
 import cn.enncloud.iot.iotgatewaymodbus.http.constants.NettyChannelMap;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DeviceInfo;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DmsDeviceEntity;
+import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.ModbusCMDGroupPackages;
 import cn.enncloud.iot.iotgatewaymodbus.http.tools.Tool;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
@@ -89,8 +90,10 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
                 logger.info("来自设备的信息解密后：{}" ,plainText);
                 byte[] bytesTemp = TCPServerNetty.hexToByteArray(plainText);
 
+                AttributeKey<ModbusCMDGroupPackages> attributeKey2 = AttributeKey.valueOf("modbusCMDGroupPackages");
+                ModbusCMDGroupPackages modbusCMDGroupPackages = ctx.channel().attr(attributeKey2).get();
                 logger.info("上述消息是从设备采集到的消息！");
-                TCPServerNetty.getMessageMap().put(dmsDeviceEntity.getId(), bytesTemp);
+                TCPServerNetty.getMessageMap().put((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress(), bytesTemp);
 //                ctx.channel().write(bytesTemp);
             }
         }

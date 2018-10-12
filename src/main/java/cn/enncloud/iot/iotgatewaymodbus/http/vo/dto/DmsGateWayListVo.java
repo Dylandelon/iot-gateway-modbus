@@ -9,7 +9,7 @@ public class DmsGateWayListVo {
 
     private Integer id;
 
-    @JsonFormat(pattern = "yyyy-MM-ddTHH:mm:ss.fff")
+//    @JsonFormat(pattern = "yyyy-MM-ddTHH:mm:ss.fff")
     private LocalDateTime recentOnline;
 
     private List<DmsDeviceListVo> deviceList;
