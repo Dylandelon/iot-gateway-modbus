@@ -433,12 +433,8 @@ public class ModbusProto {
 
         // 按照功能码分组
         Map<Integer,List<DmsProtocolPointModbusEntity>> dmsProtocolPointModbusEntityMap =
-                pointDTO.stream().sorted(Comparator.comparing(DmsProtocolPointModbusEntity::getRegisterAddress))
+                pointDTO.stream().filter(dmsProtocolPointModbusEntity -> dmsProtocolPointModbusEntity.getRwFlag() > 0).sorted(Comparator.comparing(DmsProtocolPointModbusEntity::getRegisterAddress))
                 .collect(Collectors.groupingBy(DmsProtocolPointModbusEntity::getRegType));
-        // todo 当前数据库维护的数据有问题，都是0表示禁止读写
-//        Map<Integer,List<DmsProtocolPointModbusEntity>> dmsProtocolPointModbusEntityMap =
-//                pointDTO.stream().filter(dmsProtocolPointModbusEntity -> dmsProtocolPointModbusEntity.getRwFlag() > 0).sorted(Comparator.comparing(DmsProtocolPointModbusEntity::getRegisterAddress))
-//                .collect(Collectors.groupingBy(DmsProtocolPointModbusEntity::getRegType));
 
 
         // 每40地址区间生成一个命令
