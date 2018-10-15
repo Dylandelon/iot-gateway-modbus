@@ -1,7 +1,6 @@
 package cn.enncloud.iot.iotgatewaymodbus.netty;
 
 import cn.enncloud.iot.iotgatewaymodbus.http.constants.NettyChannelMap;
-import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DeviceInfo;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DmsDeviceEntity;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.ModbusCMDGroupPackages;
 import cn.enncloud.iot.iotgatewaymodbus.http.tools.Tool;
@@ -14,7 +13,6 @@ import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,8 +25,6 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
         super.channelActive(ctx);
 
         logger.info("CLIENT" + getRemoteAddress(ctx) + " 接入连接");
-        //往channel map中添加channel信息
-//        TCPServerNetty.getMap().put(getIPString(ctx), ctx);
     }
 
     @Override
@@ -43,19 +39,6 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
     protected void channelRead0(ChannelHandlerContext ctx, byte[] msg)
             throws Exception {
         logger.info("来自设备的信息：" + TCPServerNetty.bytesToHexString(msg));
-//        logger.info("来自设备的信息2：" + TCPServerNetty.bytesToHexStringCompact(msg));
-//
-//        String plainText=Tool.SC_Tea_Encryption_Str(TCPServerNetty.bytesToHexStringCompact(msg),"2018091200000000");
-//        logger.info("来自设备的信息解密后：{}" ,plainText);
-//        byte[] bytesTemp = TCPServerNetty.hexToByteArray(plainText);
-//
-//        byte byteA3 = bytesTemp[1];
-//        byte[] addressDomain = new byte[3];
-//        byte[] addressDomain = new byte[5];
-//        System.arraycopy(msg, 7, addressDomain, 0, 5);
-////        System.arraycopy(msg, 0, addressDomain, 0, 3);
-//        String str1 = getKeyFromArray(addressDomain); //生成key
-//        logger.info("根据地址域生成的Key为：" + str1);
 
         if(msg.length==1){
             ByteBuf buf = ctx.alloc().buffer(msg.length);
@@ -70,7 +53,6 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
                     logger.info("心跳下发成功！");
                 }
             });
-//            ctx.channel().write(msg);
         }else{
             AttributeKey<DmsDeviceEntity> attributeKey = AttributeKey.valueOf("dmsDeviceEntity");
             DmsDeviceEntity dmsDeviceEntity = ctx.channel().attr(attributeKey).get();
