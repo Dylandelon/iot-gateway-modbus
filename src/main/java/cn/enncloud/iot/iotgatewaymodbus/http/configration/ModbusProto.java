@@ -17,6 +17,24 @@ import java.util.stream.Collectors;
  */
 @Log4j
 public class ModbusProto {
+    static void print_byte(String name,byte[] data,int len)
+    {
+        String logmsg=name;
+        for(int i=0;i<len;i++)
+        {
+            logmsg=logmsg+String.format("%02x ",data[i]);
+        }
+        log.info(logmsg);
+    }
+    static void print_byte(String name,byte[] data)
+    {
+        String logmsg=name;
+        for(int i=0;i<data.length;i++)
+        {
+            logmsg=logmsg+String.format("%02x ",data[i]);
+        }
+        log.info(logmsg);
+    }
     public static byte[] getBytesBuf(MsgPack msgPack) {
         byte[] datbytes=null;
         if(msgPack.funCode<5)
@@ -266,7 +284,29 @@ public class ModbusProto {
             } else {
                 result=ModbusByteToFloat(name,data,offset,AlignType,registerLength*2);
             }
-        } else {
+        } else if (DataFormat.toUpperCase().equals("DOUBLE")) {
+            if (registerLength == 1) {
+                if (AlignType == 1) {
+                    result=ModbusByteToDouble(name,data,offset,AlignType,registerLength*2);
+                } else {
+                    result=ModbusByteToDouble(name,data,offset,AlignType,registerLength*2);
+                }
+            } else if (registerLength == 2) {
+                if (AlignType == 1) {
+                    result=ModbusByteToDouble(name,data,offset,AlignType,registerLength*2);
+                } else {
+                    result=ModbusByteToDouble(name,data,offset,AlignType,registerLength*2);
+                }
+            } else if (registerLength == 4) {
+                if (AlignType == 1) {
+                    result=ModbusByteToDouble(name,data,offset,AlignType,registerLength*2);
+                } else {
+                    result=ModbusByteToDouble(name,data,offset,AlignType,registerLength*2);
+                }
+            } else {
+                result=ModbusByteToDouble(name,data,offset,AlignType,registerLength*2);
+            }
+        } else  {
             if (registerLength == 1) {
                 if (AlignType == 1) {
                     value = get256_n(data[offset + 0],1)  + get256_n(data[offset + 1],0);
@@ -394,6 +434,106 @@ public class ModbusProto {
         else
             retdata=retdata1;
         return retdata;
+    }
+    static  float ModbusByteToDouble(String Name,byte[] datas,int offset,int AlignType,int num) {
+        if(num>8)
+            num=8;
+        double retdata=0;
+        double retdata1=0;
+        double retdata2=0;
+        double retdata3=0;
+        float floatdata=0;
+        if(num<4)
+            return floatdata;
+        byte[] bytes=new byte[8];
+        byte[] bytes1=new byte[8];
+        byte[] bytes2=new byte[8];
+        byte[] bytes3=new byte[8];
+
+        //if(AlignType==2) //大端2
+        //{
+        //bytes[num-1-i]=datas[offset+i];//小端
+        bytes[0]=datas[offset+1];
+        bytes[1]=datas[offset+0];
+        bytes[2]=datas[offset+3];
+        bytes[3]=datas[offset+2];
+        bytes[4]=datas[offset+5];
+        bytes[5]=datas[offset+4];
+        bytes[6]=datas[offset+7];
+        bytes[7]=datas[offset+6];
+        //  }else {
+        bytes1[0]=datas[offset+0];
+        bytes1[1]=datas[offset+1];
+        bytes1[2]=datas[offset+2];
+        bytes1[3]=datas[offset+3];
+        bytes1[4]=datas[offset+4];
+        bytes1[5]=datas[offset+5];
+        bytes1[6]=datas[offset+6];
+        bytes1[7]=datas[offset+7];
+        //}
+        bytes2[4]=datas[offset+4];
+        bytes2[5]=datas[offset+5];
+        bytes2[6]=datas[offset+6];
+        bytes2[7]=datas[offset+7];
+        bytes2[0]=datas[offset+2];
+        bytes2[1]=datas[offset+3];
+        bytes2[2]=datas[offset+0];
+        bytes2[3]=datas[offset+1];
+
+
+        bytes3[0]=datas[offset+7];
+        bytes3[1]=datas[offset+6];
+        bytes3[2]=datas[offset+5];
+        bytes3[3]=datas[offset+4];
+        bytes3[4]=datas[offset+3];
+        bytes3[5]=datas[offset+2];
+        bytes3[6]=datas[offset+1];
+        bytes3[7]=datas[offset+0];
+
+        //再将bais 封装为DataInputStream类型
+        try {
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+            DataInputStream dis = new DataInputStream(bais);
+            retdata= dis.readDouble();
+            dis.close();
+        } catch (Exception ex)
+        {
+
+        }
+        try {
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes1);
+            DataInputStream dis = new DataInputStream(bais);
+            retdata1= dis.readDouble();
+            dis.close();
+        } catch (Exception ex)
+        {
+
+        }
+        try {
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes2);
+            DataInputStream dis = new DataInputStream(bais);
+            retdata2= dis.readDouble();
+            dis.close();
+        } catch (Exception ex)
+        {
+
+        }
+        try {
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes3);
+            DataInputStream dis = new DataInputStream(bais);
+            retdata3= dis.readDouble();
+            dis.close();
+        } catch (Exception ex)
+        {
+
+        }
+        log.info(String.format(Name+"  AlignType=%d:(1)%f (2)%f (3)%f (4)%f",AlignType,retdata,retdata1,retdata2,retdata3));
+        if(AlignType==0)
+            retdata=retdata1;
+        else
+            retdata=retdata2;
+        floatdata=(float)retdata;
+        return floatdata;
     }
     public static ReadUpInfo getUpProtocolDTO(MsgPack msgPack, byte[] revdata, int len, List<DmsProtocolPointModbusEntity>  pointDTO, String secretKey) {
         if(pointDTO==null)
