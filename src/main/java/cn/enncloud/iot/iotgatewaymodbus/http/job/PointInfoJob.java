@@ -133,10 +133,11 @@ public class PointInfoJob implements Runnable{
                         ReadUpInfo readUpInfo=null;
                         IotMessage kafkaData=null;
 
-                        int timeCount = 5*1000;
+                        int timeCount = 3*1000;
                         while (System.currentTimeMillis() - startTime <20*1000){
+                            timeCount = timeCount+2*1000;
                             try {
-                                Thread.sleep(timeCount+2*1000);
+                                Thread.sleep(timeCount);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
