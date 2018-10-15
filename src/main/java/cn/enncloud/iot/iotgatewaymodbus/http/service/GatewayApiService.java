@@ -57,4 +57,5 @@ public interface GatewayApiService {
     List<DmsProtocolPointModbusEntity> getModbusPointDTOFromApiByDeviceId(long deviceId);
     List<DmsGatewayEntity> getDatewayDTOFromApiByGatewayId(long gatewayId);
     boolean dmsGateWayUpdatePost(DmsGateWayUpdateVo entity);
+    List<DmsDeviceEntity> getDeviceDTOFromApiByDeviceId(long deviceId);
 }

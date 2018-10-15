@@ -368,4 +368,31 @@ public class GatewayApiServiceImpl implements GatewayApiService {
         }
         return flag;
     }
+    @Override
+    public List<DmsDeviceEntity> getDeviceDTOFromApiByDeviceId(long deviceId) {
+        DeviceDTO deviceDTO = null;
+        DataRespBody<List<DmsDeviceEntity>> dataRespBody = null;
+        List<DmsDeviceEntity> dmsDeviceEntityList = null;
+        Long beginTime = System.currentTimeMillis();
+        try {
+            dataRespBody = dmsGatewayService.dmsDeviceGet(deviceId, null, null);
+            ObjectMapper mapper = new ObjectMapper();
+            dmsDeviceEntityList = mapper.convertValue(dataRespBody.getData(),new TypeReference<List<DmsDeviceEntity>>() {});
+//            if (log.isDebugEnabled()) {
+//                log.debug(messageSource.getMessage(
+//                        LogKeyConst.LOG_META_DEBUG_213,
+//                        new Object[]{System.currentTimeMillis() - beginTime},
+//                        LogKeyConst.LOG_DEFAULT,
+//                        Locale.CHINA));
+//            }
+
+        } catch (Exception ex) {
+//            log.error(messageSource.getMessage(
+//                    LogKeyConst.LOG_META_ERROR_214,
+//                    new Object[]{System.currentTimeMillis() - beginTime, gatewayId, JsonUtils.writeValueAsString(dataRespBody)},
+//                    LogKeyConst.LOG_DEFAULT,
+//                    Locale.CHINA), ex);
+        }
+        return dmsDeviceEntityList;
+    }
 }

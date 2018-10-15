@@ -75,14 +75,8 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
             AttributeKey<DmsDeviceEntity> attributeKey = AttributeKey.valueOf("dmsDeviceEntity");
             DmsDeviceEntity dmsDeviceEntity = ctx.channel().attr(attributeKey).get();
             if(dmsDeviceEntity ==null){
-//            byte[] addressDomain = new byte[5];
-//            System.arraycopy(msg, 7, addressDomain, 0, 5);
-//            String str1 = getKeyFromArray(addressDomain); //生成key
-//            logger.info("根据地址域生成的Key为：" + str1);
                 logger.info("根据注册信息解析手机号：" + Tool.getMobileNO(new String(msg,"utf-8")));
-//                TCPServerNetty.getMap().put(Tool.getMobileNO(new String(msg,"utf-8")), ctx);
                 NettyChannelMap.add((Tool.getMobileNO(new String(msg,"utf-8"))),(SocketChannel)ctx.channel());
-//                ctx.channel().write(msg);
             }else{
                 logger.info("来自设备的信息2：" + TCPServerNetty.bytesToHexStringCompact(msg));
 
@@ -92,9 +86,13 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
 
                 AttributeKey<ModbusCMDGroupPackages> attributeKey2 = AttributeKey.valueOf("modbusCMDGroupPackages");
                 ModbusCMDGroupPackages modbusCMDGroupPackages = ctx.channel().attr(attributeKey2).get();
+                if(modbusCMDGroupPackages == null){
+                    logger.info("设备返回信息超时！");
+                }else{
+                    TCPServerNetty.getMessageMap().put((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress(), bytesTemp);
+                }
                 logger.info("上述消息是从设备采集到的消息！");
-                TCPServerNetty.getMessageMap().put((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress(), bytesTemp);
-//                ctx.channel().write(bytesTemp);
+
             }
         }
 

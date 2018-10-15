@@ -2,7 +2,6 @@ package cn.enncloud.iot.iotgatewaymodbus.http.job;
 
 import cn.enncloud.iot.iotgatewaymodbus.http.configration.DevPonitCtr;
 import cn.enncloud.iot.iotgatewaymodbus.http.configration.ModbusProto;
-import cn.enncloud.iot.iotgatewaymodbus.http.configration.MsgPack;
 import cn.enncloud.iot.iotgatewaymodbus.http.configration.ReadUpInfo;
 import cn.enncloud.iot.iotgatewaymodbus.http.constants.Constant;
 import cn.enncloud.iot.iotgatewaymodbus.http.constants.Constants;
@@ -42,11 +41,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -137,7 +133,13 @@ public class PointInfoJob implements Runnable{
                         ReadUpInfo readUpInfo=null;
                         IotMessage kafkaData=null;
 
+                        int timeCount = 5*1000;
                         while (System.currentTimeMillis() - startTime <20*1000){
+                            try {
+                                Thread.sleep(timeCount+2*1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                             byte[] bytesRec = TCPServerNetty.getMessageMap().get((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress());
 //                        log.info("获取采集返回的信息："+bytesRec);
                             if(bytesRec != null ){
@@ -160,10 +162,12 @@ public class PointInfoJob implements Runnable{
 
 //                log.error("uuid:,发送kafka错误!入参:{}", JsonUtils.writeValueAsString(kafkaData));
                                 }
-                                channel.attr(attributeKey2).remove();
-                                TCPServerNetty.getMessageMap().remove((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress());
+//                                channel.attr(attributeKey2).remove();
+//                                TCPServerNetty.getMessageMap().remove((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress());
                             }
                         }
+                        channel.attr(attributeKey2).remove();
+                        TCPServerNetty.getMessageMap().remove((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress());
                     });
 
                     if(!onlineFlag.isEmpty()&&onlineFlag.get(0) ==true){
@@ -202,59 +206,7 @@ public class PointInfoJob implements Runnable{
 
 
     }
-    public void ReadData(DevPonitCtr dPCtr, byte[] databytes)
-    {
-        int len=0;
-        MsgPack msgPack=null;
-        List<DmsGatewayEntity> dmsGatewayEntityList =  gatewayApiService.getDatewayDTOFromApiByDomain("HPS");
-        // 获取网关下设备
-        List<DmsDeviceEntity> dmsDeviceEntityList = gatewayApiService.getDeviceDTOFromApiByGatewayId(dmsGatewayEntityList.get(0).getId());
-        // 获取设备下点表
-        List<DmsProtocolPointModbusEntity> dmsProtocolPointModbusEntityList = gatewayApiService.getModbusPointDTOFromApiByDeviceId(dmsDeviceEntityList.get(0).getId());
-        if (dPCtr.getDevIndex() >= dmsDeviceEntityList.size())
-            dPCtr.setDevIndex(0);
-        DmsDeviceEntity dmsDeviceEntity = dmsDeviceEntityList.get(dPCtr.getDevIndex());
-        if (dmsDeviceEntity != null) {
 
-            msgPack = ModbusProto.getDownProtocolDTO(dmsDeviceEntity,dPCtr,dmsProtocolPointModbusEntityList);
-        }
-        byte[] sendbyte=null;
-        if(msgPack!=null)
-        {
-            sendbyte= ModbusProto.getBytesBuf(msgPack);
-            log.info("设备的信息采集：" + TCPServerNetty.bytesToHexStringCompact(sendbyte));
-
-            String cipherText=Tool.SC_Tea_Encryption_Str(TCPServerNetty.bytesToHexStringCompact(sendbyte),"2018091200000000");
-            byte[] bytesWrite4 = TCPServerNetty.hexToByteArray(cipherText);
-
-            log.info("向设备下发的信息为："+TCPServerNetty.bytesToHexString(CRC16.addCRC(bytesWrite4)));
-
-//            channel.writeAndFlush(CRC16.addCRC(bytesWrite4));
-        }
-        // 接收返回信息
-//        len = Read_Data(databytes);
-        if (len <= 0) {
-            return;
-        } else if(msgPack!=null){
-            Date date = new Date();
-            DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            ReadUpInfo readUpInfo=null;
-            IotMessage kafkaData=null;
-            try {
-                readUpInfo= ModbusProto.getUpProtocolDTO(msgPack,databytes,len,dmsProtocolPointModbusEntityList,"");
-                Long timestamp = System.currentTimeMillis();
-                kafkaData=convertData(dmsDeviceEntity,readUpInfo,timestamp);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            try {
-                //发送数据到kafka
-                sendDataToKafka(dmsDeviceEntity.getSerialNum(), kafkaData);
-            } catch (Exception ex) {
-//                log.error("uuid:,发送kafka错误!入参:{}", JsonUtils.writeValueAsString(kafkaData));
-            }
-        }
-    }
     /**
      * @param deviceInfo 设备信息
      * @param readUpInfo 发送数据到kafka

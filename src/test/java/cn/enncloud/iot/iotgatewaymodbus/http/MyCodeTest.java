@@ -1,5 +1,8 @@
 package cn.enncloud.iot.iotgatewaymodbus.http;
 
+import cn.enncloud.iot.iotgatewaymodbus.http.configration.ModbusProto;
+import cn.enncloud.iot.iotgatewaymodbus.http.configration.MsgPack;
+import cn.enncloud.iot.iotgatewaymodbus.http.tools.CRC16;
 import cn.enncloud.iot.iotgatewaymodbus.http.tools.Tool;
 import cn.enncloud.iot.iotgatewaymodbus.netty.TCPServerNetty;
 import org.junit.Test;
@@ -105,17 +108,17 @@ public class MyCodeTest {
         System.out.println("ss"+ss);
 
     }
-    @Test
-    public void codet9(){
-        MsgPack msgPack = new MsgPack();
-        msgPack.devAddress=2;
-        msgPack.funCode=3;
-        msgPack.startAddress=80;
-        msgPack.registerNum=80;
-        ModbusProto.getBytesBuf(msgPack);
-
-
-    }
+//    @Test
+//    public void codet9(){
+//        MsgPack msgPack = new MsgPack();
+//        msgPack.devAddress=2;
+//        msgPack.funCode=3;
+//        msgPack.startAddress=80;
+//        msgPack.registerNum=80;
+//        ModbusProto.getBytesBuf(msgPack);
+//
+//
+//    }
     // char转byte
 
     private byte[] getBytes (char[] chars) {
@@ -161,4 +164,37 @@ public static String asciiToString(String value)
     }
     return sbu.toString();
 }
+    @Test
+    public void codet10(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("01060000");
+        sb.append(String.format("%04x", Integer.valueOf("1")));
+        byte[] bytesWriteMid = TCPServerNetty.hexToByteArray(sb.toString());
+        byte[] bytesWrite = CRC16.addCRC(bytesWriteMid);
+        System.out.println("1向设备下发的信息未加密为："+TCPServerNetty.bytesToHexString(bytesWrite));
+
+
+        byte[] datbytes=null;
+        datbytes=new byte[6];
+        datbytes[0]=(byte)1;
+        datbytes[1]=06;
+        datbytes[2]=(byte)(00);
+        datbytes[3]=(byte)00;
+        datbytes[4]=(byte)(00);
+        datbytes[5]=(byte)1;
+        byte[] bytesWrite2 = CRC16.addCRC(datbytes);
+        System.out.println("2向设备下发的信息未加密为："+TCPServerNetty.bytesToHexString(bytesWrite2));
+
+        MsgPack msgPack = new MsgPack();
+        msgPack.setFunCode((byte)6);
+        msgPack.setDevAddress(1);
+        msgPack.setStartAddress(0);
+        msgPack.setValue(1);
+        ;
+        byte[] bytesWrite3 = CRC16.addCRC(ModbusProto.getCmdBytes(msgPack));
+        System.out.println("3向设备下发的信息未加密为："+TCPServerNetty.bytesToHexString(bytesWrite3));
+
+
+
+    }
 }
