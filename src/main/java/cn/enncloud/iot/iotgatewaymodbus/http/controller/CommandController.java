@@ -101,23 +101,33 @@ public class CommandController {
         log.info("向设备下发的信息加密为："+TCPServerNetty.bytesToHexString(bytesWriteSec));
         channel.writeAndFlush(bytesWriteSec);
 
-        int timeCount = 3*1000;
-        while (System.currentTimeMillis() - startTime <20*1000){
-            timeCount = timeCount+2*1000;
-            try {
-                Thread.sleep(timeCount);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        boolean flag = false;
+        int timeCount = 500;
+        while (System.currentTimeMillis() - startTime <10*1000){
+
             byte[] bytesRec = TCPServerNetty.getMessageMap().get((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress());
             if(bytesRec != null && Arrays.equals(bytesWriteSec,bytesRec)){
-                respBody.setCode(CodeEnum.IOT_SUCCESS.getCode());
-                respBody.setMsg(CodeEnum.IOT_SUCCESS.getValue());
+
+                flag = true;
+                break;
             }else{
-                respBody.setCode(CodeEnum.IOT_FAIL.getCode());
-                respBody.setMsg("等待结果超时");
+                timeCount = timeCount*2;
+                try {
+                    Thread.sleep(timeCount);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
             }
         }
+        if(flag){
+            respBody.setCode(CodeEnum.IOT_SUCCESS.getCode());
+            respBody.setMsg(CodeEnum.IOT_SUCCESS.getValue());
+        }else{
+            respBody.setCode(CodeEnum.IOT_FAIL.getCode());
+            respBody.setMsg("等待结果超时");
+        }
+
         channel.attr(attributeKey2).remove();
         TCPServerNetty.getMessageMap().remove((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress());
         return respBody;

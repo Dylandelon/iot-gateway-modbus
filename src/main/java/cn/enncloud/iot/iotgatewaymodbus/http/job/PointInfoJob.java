@@ -134,14 +134,9 @@ public class PointInfoJob implements Runnable{
                         ReadUpInfo readUpInfo=null;
                         IotMessage kafkaData=null;
 
-                        int timeCount = 3*1000;
-                        while (System.currentTimeMillis() - startTime <20*1000){
-                            timeCount = timeCount+2*1000;
-                            try {
-                                Thread.sleep(timeCount);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+                        int timeCount = 500;
+                        while (System.currentTimeMillis() - startTime <10*1000){
+
                             byte[] bytesRec = TCPServerNetty.getMessageMap().get((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress());
 //                        log.info("获取采集返回的信息："+bytesRec);
                             if(bytesRec != null ){
@@ -166,6 +161,13 @@ public class PointInfoJob implements Runnable{
                                 }
 //                                channel.attr(attributeKey2).remove();
 //                                TCPServerNetty.getMessageMap().remove((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress());
+                            }else{
+                                timeCount = timeCount+2;
+                                try {
+                                    Thread.sleep(timeCount);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
                         channel.attr(attributeKey2).remove();
