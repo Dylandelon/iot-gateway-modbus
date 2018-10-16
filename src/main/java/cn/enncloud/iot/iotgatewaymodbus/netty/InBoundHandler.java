@@ -2,6 +2,7 @@ package cn.enncloud.iot.iotgatewaymodbus.netty;
 
 import cn.enncloud.iot.iotgatewaymodbus.http.constants.NettyChannelMap;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DmsDeviceEntity;
+import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DmsGatewayEntity;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.ModbusCMDGroupPackages;
 import cn.enncloud.iot.iotgatewaymodbus.http.tools.Tool;
 import io.netty.buffer.ByteBuf;
@@ -54,9 +55,9 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
                 }
             });
         }else{
-            AttributeKey<DmsDeviceEntity> attributeKey = AttributeKey.valueOf("dmsDeviceEntity");
-            DmsDeviceEntity dmsDeviceEntity = ctx.channel().attr(attributeKey).get();
-            if(dmsDeviceEntity ==null){
+            AttributeKey<DmsGatewayEntity> attributeKey = AttributeKey.valueOf("dmsGatewayEntity");
+            DmsGatewayEntity dmsGatewayEntity = ctx.channel().attr(attributeKey).get();
+            if(dmsGatewayEntity ==null){
                 logger.info("根据注册信息解析手机号：" + Tool.getMobileNO(new String(msg,"utf-8")));
                 NettyChannelMap.add((Tool.getMobileNO(new String(msg,"utf-8"))),(SocketChannel)ctx.channel());
             }else{

@@ -73,10 +73,13 @@ public class PointInfoJob implements Runnable{
         dmsGatewayEntityList.forEach(dmsGatewayEntity -> {
             // 根据网关获取channel
             Channel channel = NettyChannelMap.get(dmsGatewayEntity.getSerialNum());
+
             if(channel == null){
                 log.info("网关没有注册："+dmsGatewayEntity.getSerialNum());
             }else{
                 log.info("网关准备采集："+dmsGatewayEntity.getSerialNum());
+                AttributeKey<DmsGatewayEntity> attributeKey = AttributeKey.valueOf("dmsGatewayEntity");
+                channel.attr(attributeKey).set(dmsGatewayEntity);
                 DmsGateWayUpdateVo dmsGateWayUpdateVo = new DmsGateWayUpdateVo();
                 // ip+port
                 String ip = "";
@@ -116,9 +119,7 @@ public class PointInfoJob implements Runnable{
                         String cipherText = Tool.SC_Tea_Encryption_Str(TCPServerNetty.bytesToHexStringCompact(bytesWrite),"2018091200000000");
                         byte[] bytesWriteSec = TCPServerNetty.hexToByteArray(cipherText);
                         log.info("向设备下发的信息加密为："+TCPServerNetty.bytesToHexString(bytesWriteSec));
-                        ;
-                        AttributeKey<DmsDeviceEntity> attributeKey = AttributeKey.valueOf("dmsDeviceEntity");
-                        channel.attr(attributeKey).set(dmsDeviceEntity);
+
                         AttributeKey<ModbusCMDGroupPackages> attributeKey2 = AttributeKey.valueOf("modbusCMDGroupPackages");
                         channel.attr(attributeKey2).set(modbusCMDGroupPackages);
                         channel.writeAndFlush(bytesWriteSec).addListener(new ChannelFutureListener(){

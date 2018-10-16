@@ -12,6 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -193,6 +194,42 @@ public static String asciiToString(String value)
         ;
         byte[] bytesWrite3 = CRC16.addCRC(ModbusProto.getCmdBytes(msgPack));
         System.out.println("3向设备下发的信息未加密为："+TCPServerNetty.bytesToHexString(bytesWrite3));
+
+
+
+    }
+    @Test
+    public void codet11(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("01060000");
+        sb.append(String.format("%04x", Integer.valueOf("1")));
+        byte[] bytesWriteMid = TCPServerNetty.hexToByteArray(sb.toString());
+        byte[] bytesWrite = CRC16.addCRC(bytesWriteMid);
+        System.out.println("1向设备下发的信息未加密为："+TCPServerNetty.bytesToHexString(bytesWrite));
+
+
+        byte[] datbytes=null;
+        datbytes=new byte[6];
+        datbytes[0]=(byte)1;
+        datbytes[1]=06;
+        datbytes[2]=(byte)(00);
+        datbytes[3]=(byte)00;
+        datbytes[4]=(byte)(00);
+        datbytes[5]=(byte)1;
+        byte[] bytesWrite2 = CRC16.addCRC(datbytes);
+        System.out.println("2向设备下发的信息未加密为："+TCPServerNetty.bytesToHexString(bytesWrite2));
+
+        MsgPack msgPack = new MsgPack();
+        msgPack.setFunCode((byte)6);
+        msgPack.setDevAddress(1);
+        msgPack.setStartAddress(0);
+        msgPack.setValue(1);
+        ;
+        byte[] bytesWrite3 = CRC16.addCRC(ModbusProto.getCmdBytes(msgPack));
+        System.out.println("3向设备下发的信息未加密为："+TCPServerNetty.bytesToHexString(bytesWrite3));
+
+        System.out.println("比较是否相等："+ Arrays.equals(bytesWrite2,bytesWrite3));
+
 
 
 
