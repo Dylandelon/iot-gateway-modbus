@@ -30,6 +30,7 @@
         <docker.registry.url>reg.enncloud.cn</docker.registry.url>
         <spring-cloud.version>Edgware.SR3</spring-cloud.version>
         <spring-boot.version>1.5.13.RELEASE</spring-boot.version>
+        <skipTests>true</skipTests>
     </properties>
 
     <dependencies>
