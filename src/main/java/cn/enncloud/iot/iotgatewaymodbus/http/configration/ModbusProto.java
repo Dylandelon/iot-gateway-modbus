@@ -544,18 +544,23 @@ public class ModbusProto {
         return msgPack;
     }
     public static byte[] getCmdBytes(MsgPack msgPack) {
+
         byte[] datbytes=null;
-        if(msgPack.getFunCode()>4)
-        {
-            datbytes=new byte[6];
-            datbytes[0]=(byte)msgPack.getDevAddress();
-            datbytes[1]=msgPack.getFunCode();
-            datbytes[2]=(byte)(msgPack.getStartAddress()>>8);
-            datbytes[3]=(byte)msgPack.getStartAddress();
-            datbytes[4]=(byte)(msgPack.getValue()>>8);
-            datbytes[5]=(byte)msgPack.getValue();
-            //datbytes=Tool.SC_Tea_Encryption(datbytes,secretKey.getBytes());
+        if(msgPack.getFunCode()==1){
+            msgPack.setFunCode((byte)5);
+        }else if(msgPack.getFunCode()==3){
+            msgPack.setFunCode((byte)6);
+        }else{
+            return datbytes;
         }
+        datbytes=new byte[6];
+        datbytes[0]=(byte)msgPack.getDevAddress();
+        datbytes[1]=msgPack.getFunCode();
+        datbytes[2]=(byte)(msgPack.getStartAddress()>>8);
+        datbytes[3]=(byte)msgPack.getStartAddress();
+        datbytes[4]=(byte)(msgPack.getValue()>>8);
+        datbytes[5]=(byte)msgPack.getValue();
+        //datbytes=Tool.SC_Tea_Encryption(datbytes,secretKey.getBytes());
         return datbytes;
     }
 

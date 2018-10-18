@@ -167,6 +167,10 @@ public class PointInfoJob implements Runnable{
                                 try {
 //                                    readUpInfo= ModbusProto.getUpProtocolDTO(msgPack,bytesRec,bytesRec.length,dmsProtocolPointModbusEntityList,"");
                                     readUpInfo= ModbusProto.analysisUpProtocol(bytesRec,bytesRec.length,modbusCMDGroupPackages,"");
+                                    if(readUpInfo ==null){
+                                        log.info("解析采集返回的信息失败：");
+                                        break;
+                                    }
                                     print_IReadUpInfo(dmsGatewayEntity,readUpInfo);
                                     Long timestamp = System.currentTimeMillis();
                                     kafkaData=convertData(dmsDeviceEntity,readUpInfo,timestamp);

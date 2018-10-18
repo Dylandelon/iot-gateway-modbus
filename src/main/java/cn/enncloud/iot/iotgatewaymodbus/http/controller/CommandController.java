@@ -99,10 +99,10 @@ public class CommandController {
         byte[] bytesWriteMid = ModbusProto.getCmdBytes(msgPack);
 
         byte[] bytesWrite = CRC16.addCRC(bytesWriteMid);
-        log.info("向设备下发的信息未加密为："+TCPServerNetty.bytesToHexString(bytesWrite));
+        log.info("主动向设备下发的信息未加密为："+TCPServerNetty.bytesToHexString(bytesWrite));
         String cipherText = Tool.SC_Tea_Encryption_Str(TCPServerNetty.bytesToHexStringCompact(bytesWrite),"2018091200000000");
         byte[] bytesWriteSec = TCPServerNetty.hexToByteArray(cipherText);
-        log.info("向设备下发的信息加密为："+TCPServerNetty.bytesToHexString(bytesWriteSec));
+        log.info("主动向设备下发的信息加密为："+TCPServerNetty.bytesToHexString(bytesWriteSec));
         channel.writeAndFlush(bytesWriteSec);
 
         boolean flag = false;
@@ -131,6 +131,7 @@ public class CommandController {
             respBody.setCode(CodeEnum.IOT_FAIL.getCode());
             respBody.setMsg("等待结果超时");
         }
+        log.info("主动向设备下发的信息结果："+(flag ==true?"成功":"失败"));
 
         channel.attr(attributeKey2).remove();
         TCPServerNetty.getMessageMap().remove((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress());
