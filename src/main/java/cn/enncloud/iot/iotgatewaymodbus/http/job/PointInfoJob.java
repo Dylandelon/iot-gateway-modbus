@@ -167,6 +167,7 @@ public class PointInfoJob implements Runnable{
                                 try {
 //                                    readUpInfo= ModbusProto.getUpProtocolDTO(msgPack,bytesRec,bytesRec.length,dmsProtocolPointModbusEntityList,"");
                                     readUpInfo= ModbusProto.analysisUpProtocol(bytesRec,bytesRec.length,modbusCMDGroupPackages,"");
+                                    print_IReadUpInfo(dmsGatewayEntity,readUpInfo);
                                     Long timestamp = System.currentTimeMillis();
                                     kafkaData=convertData(dmsDeviceEntity,readUpInfo,timestamp);
                                 } catch (Exception ex) {
@@ -257,5 +258,23 @@ public class PointInfoJob implements Runnable{
     private void sendDataToKafka(String key, IotMessage kafkaData) throws Exception {
 
         this.output.send(MessageBuilder.withPayload(kafkaData).build());
+    }
+    void print_IReadUpInfo(DmsGatewayEntity deviceInfo,ReadUpInfo readUpInfo)
+    {
+        String logmsg="接收到数据 设备SerialNum:"+deviceInfo.getSerialNum();
+        try {
+            Map<String, Object> data = readUpInfo.getData();
+            logmsg = logmsg + " data:";
+            for (String key : data.keySet()) {
+                {
+                    logmsg = logmsg + "," + key + ":" + data.get(key);
+                }
+            }
+            log.info(logmsg);
+        }catch (Exception ex)
+        {
+
+        }
+
     }
 }

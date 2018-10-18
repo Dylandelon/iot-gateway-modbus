@@ -102,5 +102,5 @@ enn:
     port:  80
 job:
   digital:
-    cron: 0/30 * * * * ?
+    cron: 0/1 * * * * ?
     period: 1
