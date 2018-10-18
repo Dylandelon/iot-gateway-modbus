@@ -37,20 +37,6 @@ public interface GatewayApiService {
      */
     PointDTO<ModbusPointInfo> getModbusPointDTOFromApi(int deviceId);
 
-    /**
-     * @param deviceId 设备id
-     * @return 点表信息
-     * 获取新奥376.1协议点表信息
-     */
-    PointDTO<Xinao376PointInfo> getXinao376PointDTOFromApi(int deviceId);
-
-    /**
-     * @param protocolTypeId 协议类型id
-     * @return 点表信息
-     * 获取新奥376.1协议点表信息
-     */
-    Map<String, ProtocolPointInfo> getXinao376PointDTOMapFromApi(int protocolTypeId);
-
     List<DmsGatewayEntity> getDatewayDTOFromApiByDomain(String domain);
     List<DmsDeviceEntity> getDeviceDTOFromApiByGatewayId(long gatewayId);
 

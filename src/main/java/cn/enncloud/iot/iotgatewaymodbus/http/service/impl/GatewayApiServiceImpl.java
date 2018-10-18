@@ -2,10 +2,12 @@ package cn.enncloud.iot.iotgatewaymodbus.http.service.impl;
 
 
 import cn.enncloud.iot.iotgatewaymodbus.http.constants.CodeEnum;
+import cn.enncloud.iot.iotgatewaymodbus.http.constants.LogKeyConst;
 import cn.enncloud.iot.iotgatewaymodbus.http.response.DataRespBody;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.DmsGatewayService;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.GatewayApiService;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.*;
+import cn.enncloud.iot.iotgatewaymodbus.http.tools.JsonUtils;
 import cn.enncloud.iot.iotgatewaymodbus.http.vo.dto.DmsGateWayUpdateVo;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author sunhongqiang
@@ -45,13 +44,13 @@ public class GatewayApiServiceImpl implements GatewayApiService {
         Long beginTime = System.currentTimeMillis();
         try {
             dataRespBody = dmsGatewayService.dmsGatewayGet(null, serialNum, null, null);
-//            if (log.isDebugEnabled()) {
-//                log.debug(messageSource.getMessage(
-//                        LogKeyConst.LOG_META_DEBUG_211,
-//                        new Object[]{System.currentTimeMillis() - beginTime},
-//                        LogKeyConst.LOG_DEFAULT,
-//                        Locale.CHINA));
-//            }
+            if (log.isDebugEnabled()) {
+                log.debug(messageSource.getMessage(
+                        LogKeyConst.LOG_2_1_1,
+                        new Object[]{System.currentTimeMillis() - beginTime},
+                        LogKeyConst.LOG_DEFAULT,
+                        Locale.CHINA));
+            }
             if (dataRespBody.getData().size() > 0) {
                 HashMap map = (HashMap) dataRespBody.getData().get(0);
                 gatewayDTO = new GatewayDTO();
@@ -60,11 +59,16 @@ public class GatewayApiServiceImpl implements GatewayApiService {
                 gatewayDTO.setToken((Integer) map.get("token"));
             }
         } catch (Exception ex) {
-//            log.error(messageSource.getMessage(
-//                    LogKeyConst.LOG_META_ERROR_212,
-//                    new Object[]{System.currentTimeMillis() - beginTime, serialNum, JsonUtils.writeValueAsString(dataRespBody)},
-//                    LogKeyConst.LOG_DEFAULT,
-//                    Locale.CHINA), ex);
+            if(log.isErrorEnabled()){
+                Map map = new HashMap();
+                map.put("serialNum",serialNum);
+                log.error(messageSource.getMessage(
+                        LogKeyConst.LOG_2_1_2,
+                        new Object[]{System.currentTimeMillis() - beginTime, JsonUtils.writeValueAsString(map), JsonUtils.writeValueAsString(dataRespBody)},
+                        LogKeyConst.LOG_DEFAULT,
+                        Locale.CHINA), ex);
+            }
+
         }
         return gatewayDTO;
     }
@@ -81,13 +85,13 @@ public class GatewayApiServiceImpl implements GatewayApiService {
         Long beginTime = System.currentTimeMillis();
         try {
             dataRespBody = dmsGatewayService.dmsDeviceGet(null, (long) gatewayId, null);
-//            if (log.isDebugEnabled()) {
-//                log.debug(messageSource.getMessage(
-//                        LogKeyConst.LOG_META_DEBUG_213,
-//                        new Object[]{System.currentTimeMillis() - beginTime},
-//                        LogKeyConst.LOG_DEFAULT,
-//                        Locale.CHINA));
-//            }
+            if (log.isDebugEnabled()) {
+                log.debug(messageSource.getMessage(
+                        LogKeyConst.LOG_2_2_1,
+                        new Object[]{System.currentTimeMillis() - beginTime},
+                        LogKeyConst.LOG_DEFAULT,
+                        Locale.CHINA));
+            }
             if (dataRespBody.getData().size() > 0) {
                 deviceDTO = new DeviceDTO();
                 List<DeviceInfo> deviceInfoList = new ArrayList<>();
@@ -105,11 +109,16 @@ public class GatewayApiServiceImpl implements GatewayApiService {
                 deviceDTO.setDeviceList(deviceInfoList);
             }
         } catch (Exception ex) {
-//            log.error(messageSource.getMessage(
-//                    LogKeyConst.LOG_META_ERROR_214,
-//                    new Object[]{System.currentTimeMillis() - beginTime, gatewayId, JsonUtils.writeValueAsString(dataRespBody)},
-//                    LogKeyConst.LOG_DEFAULT,
-//                    Locale.CHINA), ex);
+            if(log.isErrorEnabled()){
+                Map map = new HashMap();
+                map.put("gatewayId",gatewayId);
+                log.error(messageSource.getMessage(
+                        LogKeyConst.LOG_2_2_2,
+                        new Object[]{System.currentTimeMillis() - beginTime, JsonUtils.writeValueAsString(map), JsonUtils.writeValueAsString(dataRespBody)},
+                        LogKeyConst.LOG_DEFAULT,
+                        Locale.CHINA), ex);
+            }
+
         }
         return deviceDTO;
     }
@@ -126,13 +135,13 @@ public class GatewayApiServiceImpl implements GatewayApiService {
         Long beginTime = System.currentTimeMillis();
         try {
             dataRespBody = dmsGatewayService.dmsPointForGateway((long) deviceId);
-//            if (log.isDebugEnabled()) {
-//                log.debug(messageSource.getMessage(
-//                        LogKeyConst.LOG_META_DEBUG_215,
-//                        new Object[]{System.currentTimeMillis() - beginTime},
-//                        LogKeyConst.LOG_DEFAULT,
-//                        Locale.CHINA));
-//            }
+            if (log.isDebugEnabled()) {
+                log.debug(messageSource.getMessage(
+                        LogKeyConst.LOG_2_3_1,
+                        new Object[]{System.currentTimeMillis() - beginTime},
+                        LogKeyConst.LOG_DEFAULT,
+                        Locale.CHINA));
+            }
             if (dataRespBody.getData().size() > 0) {
                 pointDTO = new PointDTO<>();
                 List<ModbusPointInfo> pointInfoList = new ArrayList<>();
@@ -149,97 +158,21 @@ public class GatewayApiServiceImpl implements GatewayApiService {
                 pointDTO.setPointList(pointInfoList);
             }
         } catch (Exception ex) {
-//            log.error(messageSource.getMessage(
-//                    LogKeyConst.LOG_META_ERROR_216,
-//                    new Object[]{System.currentTimeMillis() - beginTime, deviceId, JsonUtils.writeValueAsString(dataRespBody)},
-//                    LogKeyConst.LOG_DEFAULT,
-//                    Locale.CHINA), ex);
+            if(log.isErrorEnabled()){
+                Map map = new HashMap();
+                map.put("deviceId",deviceId);
+                log.error(messageSource.getMessage(
+                        LogKeyConst.LOG_2_3_2,
+                        new Object[]{System.currentTimeMillis() - beginTime, JsonUtils.writeValueAsString(map), JsonUtils.writeValueAsString(dataRespBody)},
+                        LogKeyConst.LOG_DEFAULT,
+                        Locale.CHINA), ex);
+            }
+
         }
         return pointDTO;
     }
 
-    /**
-     * @param deviceId 设备id
-     * @return 点表信息
-     * 获取新奥376.1协议点表信息
-     */
-    @Override
-    public PointDTO<Xinao376PointInfo> getXinao376PointDTOFromApi(int deviceId) {
-        PointDTO<Xinao376PointInfo> pointDTO = null;
-        DataRespBody dataRespBody = null;
-        Long beginTime = System.currentTimeMillis();
-        try {
-            dataRespBody = dmsGatewayService.dmsPointForGateway((long) deviceId);
-//            if (log.isDebugEnabled()) {
-//                log.debug(messageSource.getMessage(
-//                        LogKeyConst.LOG_META_DEBUG_215,
-//                        new Object[]{System.currentTimeMillis() - beginTime},
-//                        LogKeyConst.LOG_DEFAULT,
-//                        Locale.CHINA));
-//            }
-            if (dataRespBody.getData().size() > 0) {
-                pointDTO = new PointDTO<>();
-                List<Xinao376PointInfo> pointInfoList = new ArrayList<>();
-                for (int i = 0; i < dataRespBody.getData().size(); i++) {
-                    HashMap map = (HashMap) dataRespBody.getData().get(i);
-                    Xinao376PointInfo pointInfo = new Xinao376PointInfo();
-                    pointInfo.setAlignType((Integer) map.get("alignType"));
-                    pointInfo.setDataFormat((String) map.get("dataFormat"));
-                    pointInfo.setDt((Integer) map.get("unitDt"));
-                    pointInfo.setMetric((String) map.get("dmsPointName"));
-                    pointInfoList.add(pointInfo);
-                }
-                pointDTO.setPointList(pointInfoList);
-            }
-        } catch (Exception ex) {
-//            log.error(messageSource.getMessage(
-//                    LogKeyConst.LOG_META_ERROR_216,
-//                    new Object[]{System.currentTimeMillis() - beginTime, deviceId, JsonUtils.writeValueAsString(dataRespBody)},
-//                    LogKeyConst.LOG_DEFAULT,
-//                    Locale.CHINA), ex);
-        }
-        return pointDTO;
-    }
 
-    /**
-     * @param protocolTypeId 协议类型id
-     * @return 点表信息
-     * 获取新奥376.1协议点表信息
-     */
-    @Override
-    public Map<String, ProtocolPointInfo> getXinao376PointDTOMapFromApi(int protocolTypeId) {
-        Map<String, ProtocolPointInfo> pointInfoMap = null;
-        DataRespBody dataRespBody = null;
-        Long beginTime = System.currentTimeMillis();
-        try {
-            dataRespBody = dmsGatewayService.dmsXinao3761ProtocolPoint((long) protocolTypeId);
-//            if (log.isDebugEnabled()) {
-//                log.debug(messageSource.getMessage(
-//                        LogKeyConst.LOG_META_DEBUG_215,
-//                        new Object[]{System.currentTimeMillis() - beginTime},
-//                        LogKeyConst.LOG_DEFAULT,
-//                        Locale.CHINA));
-//            }
-            if (dataRespBody.getData().size() > 0) {
-                for (int i = 0; i < dataRespBody.getData().size(); i++) {
-                    HashMap map = (HashMap) dataRespBody.getData().get(i);
-                    ProtocolPointInfo pointInfo = new ProtocolPointInfo();
-                    String da = map.get("alignType").toString();
-                    String dt = map.get("unitDt").toString();
-                    pointInfo.setAlignType((Integer) map.get("alignType"));
-                    pointInfo.setDataFormat((String) map.get("dataFormat"));
-                    pointInfoMap.put(da + "_" + dt, pointInfo);
-                }
-            }
-        } catch (Exception ex) {
-//            log.error(messageSource.getMessage(
-//                    LogKeyConst.LOG_META_ERROR_216,
-//                    new Object[]{System.currentTimeMillis() - beginTime, protocolTypeId, JsonUtils.writeValueAsString(dataRespBody)},
-//                    LogKeyConst.LOG_DEFAULT,
-//                    Locale.CHINA), ex);
-        }
-        return pointInfoMap;
-    }
     @Override
     public List<DmsGatewayEntity> getDatewayDTOFromApiByDomain(String domain) {
         DataRespBody dataRespBody = null;
@@ -247,17 +180,28 @@ public class GatewayApiServiceImpl implements GatewayApiService {
         Long beginTime = System.currentTimeMillis();
         try {
             dataRespBody = dmsGatewayService.dmsGatewayGet(null, null, domain, null);
+            if (log.isDebugEnabled()) {
+                log.debug(messageSource.getMessage(
+                        LogKeyConst.LOG_2_1_1,
+                        new Object[]{System.currentTimeMillis() - beginTime},
+                        LogKeyConst.LOG_DEFAULT,
+                        Locale.CHINA));
+            }
             ObjectMapper mapper = new ObjectMapper();
             dmsGatewayEntityList = mapper.convertValue(dataRespBody.getData(),new TypeReference<List<DmsGatewayEntity>>() {});
 
 
         } catch (Exception ex) {
-            log.error("获取HPS网关信息失败");
-//            log.error(messageSource.getMessage(
-//                    LogKeyConst.LOG_META_ERROR_212,
-//                    new Object[]{System.currentTimeMillis() - beginTime, serialNum, JsonUtils.writeValueAsString(dataRespBody)},
-//                    LogKeyConst.LOG_DEFAULT,
-//                    Locale.CHINA), ex);
+            if(log.isErrorEnabled()){
+                Map map = new HashMap();
+                map.put("domain",domain);
+                log.error(messageSource.getMessage(
+                        LogKeyConst.LOG_2_1_2,
+                        new Object[]{System.currentTimeMillis() - beginTime, JsonUtils.writeValueAsString(map), JsonUtils.writeValueAsString(dataRespBody)},
+                        LogKeyConst.LOG_DEFAULT,
+                        Locale.CHINA), ex);
+            }
+
         }
         return dmsGatewayEntityList;
     }
@@ -271,20 +215,25 @@ public class GatewayApiServiceImpl implements GatewayApiService {
             dataRespBody = dmsGatewayService.dmsDeviceGet(null, gatewayId, null);
             ObjectMapper mapper = new ObjectMapper();
             dmsDeviceEntityList = mapper.convertValue(dataRespBody.getData(),new TypeReference<List<DmsDeviceEntity>>() {});
-//            if (log.isDebugEnabled()) {
-//                log.debug(messageSource.getMessage(
-//                        LogKeyConst.LOG_META_DEBUG_213,
-//                        new Object[]{System.currentTimeMillis() - beginTime},
-//                        LogKeyConst.LOG_DEFAULT,
-//                        Locale.CHINA));
-//            }
+            if (log.isDebugEnabled()) {
+                log.debug(messageSource.getMessage(
+                        LogKeyConst.LOG_2_2_1,
+                        new Object[]{System.currentTimeMillis() - beginTime},
+                        LogKeyConst.LOG_DEFAULT,
+                        Locale.CHINA));
+            }
 
         } catch (Exception ex) {
-//            log.error(messageSource.getMessage(
-//                    LogKeyConst.LOG_META_ERROR_214,
-//                    new Object[]{System.currentTimeMillis() - beginTime, gatewayId, JsonUtils.writeValueAsString(dataRespBody)},
-//                    LogKeyConst.LOG_DEFAULT,
-//                    Locale.CHINA), ex);
+            if(log.isErrorEnabled()){
+                Map map = new HashMap();
+                map.put("gatewayId",gatewayId);
+                log.error(messageSource.getMessage(
+                        LogKeyConst.LOG_2_2_2,
+                        new Object[]{System.currentTimeMillis() - beginTime, JsonUtils.writeValueAsString(map), JsonUtils.writeValueAsString(dataRespBody)},
+                        LogKeyConst.LOG_DEFAULT,
+                        Locale.CHINA), ex);
+            }
+
         }
         return dmsDeviceEntityList;
     }
@@ -297,20 +246,25 @@ public class GatewayApiServiceImpl implements GatewayApiService {
             dataRespBody = dmsGatewayService.dmsPointForGateway(deviceId);
             ObjectMapper mapper = new ObjectMapper();
             dmsProtocolPointModbusEntityList = mapper.convertValue(dataRespBody.getData(),new TypeReference<List<DmsProtocolPointModbusEntity>>() {});
-//            if (log.isDebugEnabled()) {
-//                log.debug(messageSource.getMessage(
-//                        LogKeyConst.LOG_META_DEBUG_215,
-//                        new Object[]{System.currentTimeMillis() - beginTime},
-//                        LogKeyConst.LOG_DEFAULT,
-//                        Locale.CHINA));
-//            }
+            if (log.isDebugEnabled()) {
+                log.debug(messageSource.getMessage(
+                        LogKeyConst.LOG_2_3_1,
+                        new Object[]{System.currentTimeMillis() - beginTime},
+                        LogKeyConst.LOG_DEFAULT,
+                        Locale.CHINA));
+            }
 
         } catch (Exception ex) {
-//            log.error(messageSource.getMessage(
-//                    LogKeyConst.LOG_META_ERROR_216,
-//                    new Object[]{System.currentTimeMillis() - beginTime, deviceId, JsonUtils.writeValueAsString(dataRespBody)},
-//                    LogKeyConst.LOG_DEFAULT,
-//                    Locale.CHINA), ex);
+            if(log.isErrorEnabled()){
+                Map map = new HashMap();
+                map.put("deviceId",deviceId);
+                log.error(messageSource.getMessage(
+                        LogKeyConst.LOG_2_3_2,
+                        new Object[]{System.currentTimeMillis() - beginTime, JsonUtils.writeValueAsString(map), JsonUtils.writeValueAsString(dataRespBody)},
+                        LogKeyConst.LOG_DEFAULT,
+                        Locale.CHINA), ex);
+            }
+
         }
         return dmsProtocolPointModbusEntityList;
     }
@@ -323,20 +277,25 @@ public class GatewayApiServiceImpl implements GatewayApiService {
             dataRespBody = dmsGatewayService.dmsGatewayGet(gatewayId, null, null, null);
             ObjectMapper mapper = new ObjectMapper();
             dmsGatewayEntityList = mapper.convertValue(dataRespBody.getData(),new TypeReference<List<DmsGatewayEntity>>() {});
-//            if (log.isDebugEnabled()) {
-//                log.debug(messageSource.getMessage(
-//                        LogKeyConst.LOG_META_DEBUG_211,
-//                        new Object[]{System.currentTimeMillis() - beginTime},
-//                        LogKeyConst.LOG_DEFAULT,
-//                        Locale.CHINA));
-//            }
+            if (log.isDebugEnabled()) {
+                log.debug(messageSource.getMessage(
+                        LogKeyConst.LOG_2_1_1,
+                        new Object[]{System.currentTimeMillis() - beginTime},
+                        LogKeyConst.LOG_DEFAULT,
+                        Locale.CHINA));
+            }
 
         } catch (Exception ex) {
-//            log.error(messageSource.getMessage(
-//                    LogKeyConst.LOG_META_ERROR_212,
-//                    new Object[]{System.currentTimeMillis() - beginTime, serialNum, JsonUtils.writeValueAsString(dataRespBody)},
-//                    LogKeyConst.LOG_DEFAULT,
-//                    Locale.CHINA), ex);
+            if(log.isErrorEnabled()){
+                Map map = new HashMap();
+                map.put("gatewayId",gatewayId);
+                log.error(messageSource.getMessage(
+                        LogKeyConst.LOG_2_1_2,
+                        new Object[]{System.currentTimeMillis() - beginTime, JsonUtils.writeValueAsString(map), JsonUtils.writeValueAsString(dataRespBody)},
+                        LogKeyConst.LOG_DEFAULT,
+                        Locale.CHINA), ex);
+            }
+
         }
         return dmsGatewayEntityList;
     }
@@ -348,20 +307,23 @@ public class GatewayApiServiceImpl implements GatewayApiService {
         Long beginTime = System.currentTimeMillis();
         try {
             dataRespBody = dmsGatewayService.dmsGateWayUpdatePost(entity);
-//            if (log.isDebugEnabled()) {
-//                log.debug(messageSource.getMessage(
-//                        LogKeyConst.LOG_META_DEBUG_211,
-//                        new Object[]{System.currentTimeMillis() - beginTime},
-//                        LogKeyConst.LOG_DEFAULT,
-//                        Locale.CHINA));
-//            }
+            if (log.isDebugEnabled()) {
+                log.debug(messageSource.getMessage(
+                        LogKeyConst.LOG_2_4_1,
+                        new Object[]{System.currentTimeMillis() - beginTime},
+                        LogKeyConst.LOG_DEFAULT,
+                        Locale.CHINA));
+            }
 
         } catch (Exception ex) {
-//            log.error(messageSource.getMessage(
-//                    LogKeyConst.LOG_META_ERROR_212,
-//                    new Object[]{System.currentTimeMillis() - beginTime, serialNum, JsonUtils.writeValueAsString(dataRespBody)},
-//                    LogKeyConst.LOG_DEFAULT,
-//                    Locale.CHINA), ex);
+            if(log.isErrorEnabled()){
+                log.error(messageSource.getMessage(
+                        LogKeyConst.LOG_2_4_2,
+                        new Object[]{System.currentTimeMillis() - beginTime, JsonUtils.writeValueAsString(entity), JsonUtils.writeValueAsString(dataRespBody)},
+                        LogKeyConst.LOG_DEFAULT,
+                        Locale.CHINA), ex);
+            }
+
         }
         if(CodeEnum.IOT_SUCCESS.getCode().equalsIgnoreCase(dataRespBody.getCode())){
             flag = true;
@@ -378,20 +340,25 @@ public class GatewayApiServiceImpl implements GatewayApiService {
             dataRespBody = dmsGatewayService.dmsDeviceGet(deviceId, null, null);
             ObjectMapper mapper = new ObjectMapper();
             dmsDeviceEntityList = mapper.convertValue(dataRespBody.getData(),new TypeReference<List<DmsDeviceEntity>>() {});
-//            if (log.isDebugEnabled()) {
-//                log.debug(messageSource.getMessage(
-//                        LogKeyConst.LOG_META_DEBUG_213,
-//                        new Object[]{System.currentTimeMillis() - beginTime},
-//                        LogKeyConst.LOG_DEFAULT,
-//                        Locale.CHINA));
-//            }
+            if (log.isDebugEnabled()) {
+                log.debug(messageSource.getMessage(
+                        LogKeyConst.LOG_2_2_1,
+                        new Object[]{System.currentTimeMillis() - beginTime},
+                        LogKeyConst.LOG_DEFAULT,
+                        Locale.CHINA));
+            }
 
         } catch (Exception ex) {
-//            log.error(messageSource.getMessage(
-//                    LogKeyConst.LOG_META_ERROR_214,
-//                    new Object[]{System.currentTimeMillis() - beginTime, gatewayId, JsonUtils.writeValueAsString(dataRespBody)},
-//                    LogKeyConst.LOG_DEFAULT,
-//                    Locale.CHINA), ex);
+            if(log.isErrorEnabled()){
+                Map map = new HashMap();
+                map.put("deviceId",deviceId);
+                log.error(messageSource.getMessage(
+                        LogKeyConst.LOG_2_2_2,
+                        new Object[]{System.currentTimeMillis() - beginTime, JsonUtils.writeValueAsString(map), JsonUtils.writeValueAsString(dataRespBody)},
+                        LogKeyConst.LOG_DEFAULT,
+                        Locale.CHINA), ex);
+            }
+
         }
         return dmsDeviceEntityList;
     }

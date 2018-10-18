@@ -45,6 +45,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Condition;
 
 @Log4j
 @Component
@@ -120,7 +121,29 @@ public class PointInfoJob implements Runnable{
                         byte[] bytesWriteSec = TCPServerNetty.hexToByteArray(cipherText);
                         log.info("向设备下发的信息加密为："+TCPServerNetty.bytesToHexString(bytesWriteSec));
 
+                        AttributeKey<ModbusCMDGroupPackages> attributeKey3 = AttributeKey.valueOf("modbusCMDGroupPackagesDown");
+
+                        if(channel.attr(attributeKey3).get() !=null){
+
+                            Constants.lock.lock();
+                            if(channel.attr(attributeKey3).get() !=null){
+                                AttributeKey<Condition> attributeKey4 = AttributeKey.valueOf("condition");
+                                Condition condition = channel.attr(attributeKey4).get();
+                                try {
+                                    condition.await();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }finally {
+                                    Constants.lock.unlock();
+                                }
+                            }else{
+                                Constants.lock.unlock();
+                            }
+
+                        }
+
                         AttributeKey<ModbusCMDGroupPackages> attributeKey2 = AttributeKey.valueOf("modbusCMDGroupPackages");
+
                         channel.attr(attributeKey2).set(modbusCMDGroupPackages);
                         channel.writeAndFlush(bytesWriteSec).addListener(new ChannelFutureListener(){
                             @Override
@@ -195,20 +218,6 @@ public class PointInfoJob implements Runnable{
 
         });
 
-
-
-
-        //接受返回的数据
-
-        // 设备数据发送kafka
-
-        // 设备状态同步
-
-
-
-
-
-
     }
 
     /**
@@ -247,7 +256,6 @@ public class PointInfoJob implements Runnable{
      */
     private void sendDataToKafka(String key, IotMessage kafkaData) throws Exception {
 
-//        kafkaUtils.sendSync(kafkaConfig.getTopic(), key, JsonUtils.writeValueAsString(kafkaData));
         this.output.send(MessageBuilder.withPayload(kafkaData).build());
     }
 }

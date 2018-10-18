@@ -1,5 +1,9 @@
 package cn.enncloud.iot.iotgatewaymodbus.http.constants;
 
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * @author shq
  * @date 2018/09/06
@@ -25,5 +29,11 @@ public interface Constants {
      * "03"功能码
      */
     String FUNCTION_CODE_03 = "03";
+
+//    Object LOCK = new Object();
+
+    Lock lock = new ReentrantLock();
+//    Condition condition=lock.newCondition();
+
 
 }

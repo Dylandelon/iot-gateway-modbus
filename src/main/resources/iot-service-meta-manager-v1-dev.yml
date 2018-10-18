@@ -98,6 +98,8 @@ enn:
     kafka:
       bootstrap-servers: 10.39.10.146:9092,10.39.10.147:9092,10.39.10.148:9092
       topic: enn_logging_kafka_topic
+  netty:
+    port:  80
 job:
   digital:
     cron: 0/30 * * * * ?

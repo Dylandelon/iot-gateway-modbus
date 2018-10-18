@@ -51,55 +51,7 @@ public class ModbusProto {
         return datbytes;
     }
 
-    /**
-     * 点表按照寄存器地址升序排序
-     *
-     * @param dmsProtocolPointModbusEntityList
-     */
-    public static List<DmsProtocolPointModbusEntity> pointInfoListFilter(List<DmsProtocolPointModbusEntity> dmsProtocolPointModbusEntityList,int funcode) {
-        List<DmsProtocolPointModbusEntity> funcodelist=new ArrayList<DmsProtocolPointModbusEntity>();
-        for(int i=0;i<dmsProtocolPointModbusEntityList.size();i++)
-        {
-            DmsProtocolPointModbusEntity info=dmsProtocolPointModbusEntityList.get(i);
-            int code=3;
-            try{
-                code = info.getRegType();
-//                code=Integer.parseInt(info.getRemark().trim());
-            }catch (Exception ex)
-            {
-                //ex.printStackTrace();
-            }
-            if(code==0)
-                code=3;
-            if(code==funcode)
-            {
-                funcodelist.add(info);
-            }
-        }
-        return funcodelist;
-    }
-    /**
-     * 点表按照寄存器地址升序排序
-     *
-     * @param dmsProtocolPointModbusEntityList
-     */
-    public static List<DmsProtocolPointModbusEntity> pointInfoListSort(List<DmsProtocolPointModbusEntity> dmsProtocolPointModbusEntityList) {
-        Collections.sort(dmsProtocolPointModbusEntityList, new Comparator<DmsProtocolPointModbusEntity>() {
-            /*
-             * int compare(ModbusPointInfo p1, ModbusPointInfo p2) 返回一个基本类型的整型，
-             * 返回负数表示：p1 小于p2，
-             * 返回0 表示：p1和p2相等，
-             * 返回正数表示：p1大于p2
-             */
-            @Override
-            public int compare(DmsProtocolPointModbusEntity p1, DmsProtocolPointModbusEntity p2) {
-                //按照ModbusPointInfo的寄存器地址进行升序排列
-                return Integer.compare(p1.getRegisterAddress(), p2.getRegisterAddress());
-            }
 
-        });
-        return dmsProtocolPointModbusEntityList;
-    }
     public static String convertModbusValue(byte[] data, int offset, int AlignType, String DataFormat, int registerLength) {
         String result = null;
         int value;

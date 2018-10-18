@@ -2,9 +2,16 @@ package cn.enncloud.iot.iotgatewaymodbus.http.constants;
 
 public interface LogKeyConst {
     String LOG_DEFAULT="log.default";
-    String LOG_SYSTEM_ERROR="log.2.1.1";
-    String LOG_PROTOCAL_POINT_01="log.protocal,point.01";
     String APPLICATION_START="application.start";
+    String LOG_SYTERM_ERROR="log.syterm.error";
+    String LOG_2_1_1	="log.2.1.1";
+    String LOG_2_1_2	="log.2.1.2";
+    String LOG_2_2_1	="log.2.2.1";
+    String LOG_2_2_2	="log.2.2.2";
+    String LOG_2_3_1	="log.2.3.1";
+    String LOG_2_3_2	="log.2.3.2";
+    String LOG_2_4_1	="log.2.4.1";
+    String LOG_2_4_2	="log.2.4.2";
     String LOG_3_1_1	="log.3.1.1";
     String LOG_3_1_2	="log.3.1.2";
     String LOG_3_2_1	="log.3.2.1";

@@ -3,6 +3,7 @@ package cn.enncloud.iot.iotgatewaymodbus.http.controller;
 import cn.enncloud.iot.iotgatewaymodbus.http.configration.ModbusProto;
 import cn.enncloud.iot.iotgatewaymodbus.http.configration.MsgPack;
 import cn.enncloud.iot.iotgatewaymodbus.http.constants.CodeEnum;
+import cn.enncloud.iot.iotgatewaymodbus.http.constants.Constants;
 import cn.enncloud.iot.iotgatewaymodbus.http.constants.NettyChannelMap;
 import cn.enncloud.iot.iotgatewaymodbus.http.response.DataRespBody;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.GatewayApiService;
@@ -15,11 +16,9 @@ import cn.enncloud.iot.iotgatewaymodbus.http.tools.Tool;
 import cn.enncloud.iot.iotgatewaymodbus.http.tools.ValidatorTools;
 import cn.enncloud.iot.iotgatewaymodbus.http.vo.dto.DmsGateWayDevicControlVo;
 import cn.enncloud.iot.iotgatewaymodbus.netty.TCPServerNetty;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
 import lombok.extern.log4j.Log4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.locks.Condition;
 import java.util.stream.Collectors;
 
 @Log4j
@@ -88,8 +88,12 @@ public class CommandController {
         ModbusCMDGroupPackages modbusCMDGroupPackages = new ModbusCMDGroupPackages();
         modbusCMDGroupPackages.setMsgPack(msgPack);
         modbusCMDGroupPackages.setDmsProtocolPointModbusEntityList(modbusEntityList);
-        AttributeKey<ModbusCMDGroupPackages> attributeKey2 = AttributeKey.valueOf("modbusCMDGroupPackages");
+        AttributeKey<ModbusCMDGroupPackages> attributeKey2 = AttributeKey.valueOf("modbusCMDGroupPackagesDown");
         channel.attr(attributeKey2).set(modbusCMDGroupPackages);
+
+        AttributeKey<Condition> attributeKey3 = AttributeKey.valueOf("condition");
+        Condition condition = Constants.lock.newCondition();
+        channel.attr(attributeKey3).set(condition);
 
 
         byte[] bytesWriteMid = ModbusProto.getCmdBytes(msgPack);
@@ -130,6 +134,12 @@ public class CommandController {
 
         channel.attr(attributeKey2).remove();
         TCPServerNetty.getMessageMap().remove((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress());
+        Constants.lock.lock();
+        try {
+            condition.signal();
+        }finally {
+            Constants.lock.unlock();
+        }
         return respBody;
 
     }
