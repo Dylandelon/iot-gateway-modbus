@@ -76,7 +76,7 @@ public class PointInfoJob implements Runnable{
             Channel channel = NettyChannelMap.get(dmsGatewayEntity.getSerialNum());
 
             if(channel == null){
-                log.info("网关没有注册："+dmsGatewayEntity.getSerialNum());
+//                log.info("网关没有注册："+dmsGatewayEntity.getSerialNum());
             }else{
                 log.info("网关准备采集："+dmsGatewayEntity.getSerialNum());
                 AttributeKey<DmsGatewayEntity> attributeKey = AttributeKey.valueOf("dmsGatewayEntity");

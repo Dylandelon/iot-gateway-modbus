@@ -27,6 +27,7 @@ public class IotGatewayModbusApplication {
         } catch (Exception e) {
             System.exit(SpringApplication.exit(ctx));
         }
+        logger.info("netty监听端口："+ctx.getBean(NettyConfig.class).getPort());
         logger.info(
                 ctx.getBean(MessageSource.class).getMessage(
                         LogKeyConst.APPLICATION_START,

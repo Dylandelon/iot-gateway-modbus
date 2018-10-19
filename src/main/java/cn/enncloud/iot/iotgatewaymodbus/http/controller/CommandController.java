@@ -80,6 +80,16 @@ public class CommandController {
 
 
         Channel channel = NettyChannelMap.get(dmsGatewayEntityList.get(0).getSerialNum());
+        if(channel ==null){
+            respBody.setCode(CodeEnum.IOT_FAIL.getCode());
+            respBody.setMsg(CodeEnum.IOT_FAIL.getValue());
+            DmsGateWayDevicControlResp dmsGateWayDevicControlResp = new DmsGateWayDevicControlResp();
+
+            dmsGateWayDevicControlResp.setResultCode(DeviceCodeEnum.IOT_DEVICE_offLINE.getCode());
+            dmsGateWayDevicControlResp.setResultDesc("没有对应的设备注册进入网关："+dmsGatewayEntityList.get(0).getSerialNum());
+            respBody.setData(Arrays.asList(dmsGateWayDevicControlResp));
+            return respBody;
+        }
 
 //        StringBuilder sb = new StringBuilder();
 //        sb.append("01060000").append(String.format("%04x", Integer.valueOf(entity.getValue())));
@@ -144,8 +154,8 @@ public class CommandController {
 
             dmsGateWayDevicControlResp.setResultCode(DeviceCodeEnum.IOT_DEVICE_COMMAND_TIMEOUT.getCode());
             dmsGateWayDevicControlResp.setResultDesc(DeviceCodeEnum.IOT_DEVICE_COMMAND_TIMEOUT.getValue());
-            dmsGateWayDevicControlResp.setDevResponse(TCPServerNetty.bytesToHexString(bytesWrite));
-            respBody.setData(Arrays.asList(bytesRec));
+            dmsGateWayDevicControlResp.setDevResponse(TCPServerNetty.bytesToHexString(bytesRec));
+            respBody.setData(Arrays.asList(dmsGateWayDevicControlResp));
         }else if(flag.equalsIgnoreCase("3")){
             respBody.setCode(CodeEnum.IOT_FAIL.getCode());
             respBody.setMsg(CodeEnum.IOT_FAIL.getValue());
