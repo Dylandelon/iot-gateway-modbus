@@ -74,7 +74,7 @@ public class CommandController {
 
 
         List<DmsGatewayEntity> dmsGatewayEntityList = gatewayApiService.getDatewayDTOFromApiByGatewayId(entity.getGatewayId());
-        List<DmsDeviceEntity> dmsDeviceEntityList = gatewayApiService.getDeviceDTOFromApiByDeviceId(entity.getGatewayId());
+        List<DmsDeviceEntity> dmsDeviceEntityList = gatewayApiService.getDeviceDTOFromApiByDeviceId(entity.getDeviceId());
 
 
         Channel channel = NettyChannelMap.get(dmsGatewayEntityList.get(0).getSerialNum());
@@ -107,15 +107,15 @@ public class CommandController {
 
         boolean flag = false;
         int timeCount = 500;
-        while (System.currentTimeMillis() - startTime <10*1000){
+        while ((System.currentTimeMillis() - startTime) <10*1000){
 
             byte[] bytesRec = TCPServerNetty.getMessageMap().get((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress());
-            if(bytesRec != null && Arrays.equals(bytesWriteSec,bytesRec)){
+            if(bytesRec != null && Arrays.equals(bytesWrite,bytesRec)){
 
                 flag = true;
                 break;
             }else{
-                timeCount = timeCount*2;
+                timeCount = timeCount+1000;
                 try {
                     Thread.sleep(timeCount);
                 } catch (InterruptedException e) {

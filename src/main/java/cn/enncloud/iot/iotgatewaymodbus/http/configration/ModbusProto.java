@@ -395,19 +395,29 @@ public class ModbusProto {
             msgPack.setDevAddress((byte)(int)deviceInfo.getSlaveAddress());
             msgPack.setFunCode((byte)(int)Integer.valueOf(k));
             ;
-//            int packgeSize = (int)Math.ceil((double)(v.get(v.size()).getRegisterAddress()-v.get(0).getRegisterAddress()+v.get(v.size()).getRegisterLen())/40);
             int packgeSize = (int)Math.ceil((double)(v.size()/40));
             List<List<DmsProtocolPointModbusEntity>> groupPackages = new ArrayList<>();
             for (int i = 0; i < (packgeSize+1); i++) {
                 if(i==packgeSize){
-                    groupPackages.add(v.subList(i * 40, v.size()));
+                    List<DmsProtocolPointModbusEntity> modbusEntityList = v.subList(i * 40, v.size());
+
+                    splitPackge(groupPackages, modbusEntityList);
                 }else{
-                    groupPackages.add(v.subList(i * 40,(i+1)*40));
+                    List<DmsProtocolPointModbusEntity> modbusEntityList = v.subList(i * 40,(i+1)*40);
+
+                    splitPackge(groupPackages, modbusEntityList);
                 }
 
             }
+
             groupPackages.forEach(dmsProtocolPointModbusEntities -> {
+
                 msgPack.setStartAddress(dmsProtocolPointModbusEntities.get(0).getRegisterAddress());
+                int num = dmsProtocolPointModbusEntities.get(dmsProtocolPointModbusEntities.size() - 1).getRegisterAddress() - msgPack.getStartAddress() + dmsProtocolPointModbusEntities.get(dmsProtocolPointModbusEntities.size() - 1).getRegisterLen();
+                if(num <=24){
+
+                }
+
                 msgPack.setRegisterNum(dmsProtocolPointModbusEntities.get(dmsProtocolPointModbusEntities.size()-1).getRegisterAddress()-msgPack.getStartAddress()+dmsProtocolPointModbusEntities.get(dmsProtocolPointModbusEntities.size()-1).getRegisterLen());
                 ModbusCMDGroupPackages modbusCMDGroupPackages = new ModbusCMDGroupPackages();
                 modbusCMDGroupPackages.setMsgPack(msgPack);
@@ -419,6 +429,27 @@ public class ModbusProto {
 
         return modbusCMDGroupPackagesList;
     }
+
+    private static void splitPackge(List<List<DmsProtocolPointModbusEntity>> groupPackages, List<DmsProtocolPointModbusEntity> modbusEntityList) {
+        int registerSize = (int) Math.ceil((double) (modbusEntityList.get(modbusEntityList.size() - 1).getRegisterAddress() - modbusEntityList.get(0).getRegisterAddress() + modbusEntityList.get(modbusEntityList.size() - 1).getRegisterLen()) / 24);
+        for (int j = 0; j < registerSize; j++) {
+            List<DmsProtocolPointModbusEntity> dmsProtocolPointModbusEntities1 = new ArrayList<>();
+            for (int w = 0; w < modbusEntityList.size(); w++) {
+                int temp = modbusEntityList.get(w).getRegisterAddress() - modbusEntityList.get(0).getRegisterAddress() + modbusEntityList.get(w).getRegisterLen();
+
+                if ((j * 24) < temp && temp < (j + 1) * 24) {
+                    dmsProtocolPointModbusEntities1.add(modbusEntityList.get(w));
+                } else {
+                    if(dmsProtocolPointModbusEntities1 !=null && !dmsProtocolPointModbusEntities1.isEmpty()){
+                        groupPackages.add(dmsProtocolPointModbusEntities1);
+                    }
+                    break;
+                }
+            }
+
+        }
+    }
+
     public static ReadUpInfo analysisUpProtocol(byte[] revdata, int len, ModbusCMDGroupPackages modbusCMDGroupPackages, String secretKey) {
         if(len<5)
         {

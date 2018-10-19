@@ -67,10 +67,16 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
                 logger.info("来自设备的信息解密后：{}" ,plainText);
                 byte[] bytesTemp = TCPServerNetty.hexToByteArray(plainText);
 
+                AttributeKey<ModbusCMDGroupPackages> attributeKeyCmd = AttributeKey.valueOf("modbusCMDGroupPackagesDown");
+                ModbusCMDGroupPackages cmdGroupPackages= ctx.channel().attr(attributeKeyCmd).get();
+                if(cmdGroupPackages!=null){
+                    TCPServerNetty.getMessageMap().put((long)cmdGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress(), bytesTemp);
+                }
+
                 AttributeKey<ModbusCMDGroupPackages> attributeKey2 = AttributeKey.valueOf("modbusCMDGroupPackages");
                 ModbusCMDGroupPackages modbusCMDGroupPackages = ctx.channel().attr(attributeKey2).get();
                 if(modbusCMDGroupPackages == null){
-                    logger.info("设备返回信息超时！");
+                    logger.info("本轮接收的数据是命令下发返回结果");
                 }else{
                     TCPServerNetty.getMessageMap().put((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress(), bytesTemp);
                 }
