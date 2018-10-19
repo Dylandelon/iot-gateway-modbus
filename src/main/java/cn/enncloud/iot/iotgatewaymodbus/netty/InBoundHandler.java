@@ -76,7 +76,7 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
                 AttributeKey<ModbusCMDGroupPackages> attributeKey2 = AttributeKey.valueOf("modbusCMDGroupPackages");
                 ModbusCMDGroupPackages modbusCMDGroupPackages = ctx.channel().attr(attributeKey2).get();
                 if(modbusCMDGroupPackages == null){
-                    logger.info("本轮接收的数据是命令下发返回结果");
+                    logger.info("本轮接收的数据是命令下发返回的结果");
                 }else{
                     TCPServerNetty.getMessageMap().put((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress(), bytesTemp);
                 }

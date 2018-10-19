@@ -4,6 +4,7 @@ import cn.enncloud.iot.iotgatewaymodbus.http.configration.ModbusProto;
 import cn.enncloud.iot.iotgatewaymodbus.http.configration.MsgPack;
 import cn.enncloud.iot.iotgatewaymodbus.http.constants.CodeEnum;
 import cn.enncloud.iot.iotgatewaymodbus.http.constants.Constants;
+import cn.enncloud.iot.iotgatewaymodbus.http.constants.DeviceCodeEnum;
 import cn.enncloud.iot.iotgatewaymodbus.http.constants.NettyChannelMap;
 import cn.enncloud.iot.iotgatewaymodbus.http.response.DataRespBody;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.GatewayApiService;
@@ -14,6 +15,7 @@ import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.ModbusCMDGroupPackages
 import cn.enncloud.iot.iotgatewaymodbus.http.tools.CRC16;
 import cn.enncloud.iot.iotgatewaymodbus.http.tools.Tool;
 import cn.enncloud.iot.iotgatewaymodbus.http.tools.ValidatorTools;
+import cn.enncloud.iot.iotgatewaymodbus.http.vo.dto.DmsGateWayDevicControlResp;
 import cn.enncloud.iot.iotgatewaymodbus.http.vo.dto.DmsGateWayDevicControlVo;
 import cn.enncloud.iot.iotgatewaymodbus.netty.TCPServerNetty;
 import io.netty.channel.Channel;
@@ -105,33 +107,63 @@ public class CommandController {
         log.info("主动向设备下发的信息加密为："+TCPServerNetty.bytesToHexString(bytesWriteSec));
         channel.writeAndFlush(bytesWriteSec);
 
-        boolean flag = false;
+        String flag = "0";
         int timeCount = 500;
+        byte[] bytesRec = null;
         while ((System.currentTimeMillis() - startTime) <10*1000){
 
-            byte[] bytesRec = TCPServerNetty.getMessageMap().get((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress());
-            if(bytesRec != null && Arrays.equals(bytesWrite,bytesRec)){
-
-                flag = true;
+            bytesRec = TCPServerNetty.getMessageMap().get((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress());
+            if(bytesRec != null){
+                if(Arrays.equals(bytesWrite,bytesRec)){
+                    flag = "1";
+                }else{
+                    flag = "2";
+                }
                 break;
-            }else{
-                timeCount = timeCount+1000;
+            }else {
                 try {
                     Thread.sleep(timeCount);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    flag = "3";
                 }
-
+                timeCount = timeCount*2;
             }
+
         }
-        if(flag){
+        if(flag.equalsIgnoreCase("1")){
             respBody.setCode(CodeEnum.IOT_SUCCESS.getCode());
             respBody.setMsg(CodeEnum.IOT_SUCCESS.getValue());
-        }else{
+            DmsGateWayDevicControlResp dmsGateWayDevicControlResp = new DmsGateWayDevicControlResp();
+            dmsGateWayDevicControlResp.setResultCode(DeviceCodeEnum.IOT_DEVICE_SUCCESS.getCode());
+            dmsGateWayDevicControlResp.setResultDesc(DeviceCodeEnum.IOT_DEVICE_SUCCESS.getValue());
+            respBody.setData(Arrays.asList(dmsGateWayDevicControlResp));
+        }else if(flag.equalsIgnoreCase("2")){
             respBody.setCode(CodeEnum.IOT_FAIL.getCode());
-            respBody.setMsg("等待结果超时");
+            respBody.setMsg(CodeEnum.IOT_FAIL.getValue());
+            DmsGateWayDevicControlResp dmsGateWayDevicControlResp = new DmsGateWayDevicControlResp();
+
+            dmsGateWayDevicControlResp.setResultCode(DeviceCodeEnum.IOT_DEVICE_COMMAND_TIMEOUT.getCode());
+            dmsGateWayDevicControlResp.setResultDesc(DeviceCodeEnum.IOT_DEVICE_COMMAND_TIMEOUT.getValue());
+            dmsGateWayDevicControlResp.setDevResponse(TCPServerNetty.bytesToHexString(bytesWrite));
+            respBody.setData(Arrays.asList(bytesRec));
+        }else if(flag.equalsIgnoreCase("3")){
+            respBody.setCode(CodeEnum.IOT_FAIL.getCode());
+            respBody.setMsg(CodeEnum.IOT_FAIL.getValue());
+            DmsGateWayDevicControlResp dmsGateWayDevicControlResp = new DmsGateWayDevicControlResp();
+
+            dmsGateWayDevicControlResp.setResultCode(DeviceCodeEnum.IOT_DEVICE_WAIT_TIMEOUT.getCode());
+            dmsGateWayDevicControlResp.setResultDesc(DeviceCodeEnum.IOT_DEVICE_WAIT_TIMEOUT.getValue());
+            respBody.setData(Arrays.asList(dmsGateWayDevicControlResp));
+        }else if(flag.equalsIgnoreCase("0")){
+            respBody.setCode(CodeEnum.IOT_FAIL.getCode());
+            respBody.setMsg(CodeEnum.IOT_FAIL.getValue());
+            DmsGateWayDevicControlResp dmsGateWayDevicControlResp = new DmsGateWayDevicControlResp();
+
+            dmsGateWayDevicControlResp.setResultCode(DeviceCodeEnum.IOT_DEVICE_ERROR.getCode());
+            dmsGateWayDevicControlResp.setResultDesc(DeviceCodeEnum.IOT_DEVICE_ERROR.getValue());
+            respBody.setData(Arrays.asList(dmsGateWayDevicControlResp));
         }
-        log.info("主动向设备下发的信息结果："+(flag ==true?"成功":"失败"));
+        log.info("主动向设备下发的信息结果："+(flag .equalsIgnoreCase("1")?"成功":"失败"));
 
         channel.attr(attributeKey2).remove();
         TCPServerNetty.getMessageMap().remove((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress());
