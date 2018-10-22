@@ -51,6 +51,12 @@ public class CommandController {
         if(entity==null){
             respBody.setCode(CodeEnum.IOT_PARAM.getCode());
             respBody.setMsg(CodeEnum.IOT_PARAM.getValue());
+            DmsGateWayDevicControlResp dmsGateWayDevicControlResp = new DmsGateWayDevicControlResp();
+
+            dmsGateWayDevicControlResp.setResultCode(DeviceCodeEnum.IOT_DEVICE_POINT_UNEXIST.getCode());
+            dmsGateWayDevicControlResp.setResultDesc("请求参数不能为空");
+            respBody.setData(Arrays.asList(dmsGateWayDevicControlResp));
+            return respBody;
 
         }
         respBody.setCode(CodeEnum.IOT_FAIL.getCode());
@@ -59,14 +65,24 @@ public class CommandController {
         try {
             emptyValue = ValidatorTools.allfieldIsNUll(entity);
         } catch (Exception e) {
-            // todo
             respBody.setCode(CodeEnum.IOT_PARAM.getCode());
             respBody.setMsg(CodeEnum.IOT_PARAM.getValue());
+            DmsGateWayDevicControlResp dmsGateWayDevicControlResp = new DmsGateWayDevicControlResp();
+
+            dmsGateWayDevicControlResp.setResultCode(DeviceCodeEnum.IOT_DEVICE_POINT_UNEXIST.getCode());
+            dmsGateWayDevicControlResp.setResultDesc("校验必要参数异常："+e.getMessage());
+            respBody.setData(Arrays.asList(dmsGateWayDevicControlResp));
             return respBody;
         }
         if(emptyValue != null&& !emptyValue.isEmpty()){
             respBody.setCode(CodeEnum.IOT_PARAM.getCode());
-            respBody.setMsg(CodeEnum.IOT_PARAM.getValue()+":"+emptyValue.toString());
+            respBody.setMsg(CodeEnum.IOT_PARAM.getValue());
+            DmsGateWayDevicControlResp dmsGateWayDevicControlResp = new DmsGateWayDevicControlResp();
+
+            dmsGateWayDevicControlResp.setResultCode(DeviceCodeEnum.IOT_DEVICE_POINT_UNEXIST.getCode());
+            dmsGateWayDevicControlResp.setResultDesc("必要参数缺失："+emptyValue.toString());
+            respBody.setData(Arrays.asList(dmsGateWayDevicControlResp));
+
             return respBody;
         }
         List<DmsProtocolPointModbusEntity> dmsProtocolPointModbusEntityList = gatewayApiService.getModbusPointDTOFromApiByDeviceId(entity.getDeviceId());
@@ -122,7 +138,7 @@ public class CommandController {
         byte[] bytesRec = null;
         while ((System.currentTimeMillis() - startTime) <10*1000){
 
-            bytesRec = TCPServerNetty.getMessageMap().get((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress());
+            bytesRec = TCPServerNetty.getMessageMap().get((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress()+123);
             if(bytesRec != null){
                 if(Arrays.equals(bytesWrite,bytesRec)){
                     flag = "1";
@@ -176,7 +192,7 @@ public class CommandController {
         log.info("主动向设备下发的信息结果："+(flag .equalsIgnoreCase("1")?"成功":"失败"));
 
         channel.attr(attributeKey2).remove();
-        TCPServerNetty.getMessageMap().remove((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress());
+        TCPServerNetty.getMessageMap().remove((long)modbusCMDGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress()+123);
         Constants.lock.lock();
         try {
             condition.signal();

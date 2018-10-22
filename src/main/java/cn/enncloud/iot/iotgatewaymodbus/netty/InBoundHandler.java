@@ -70,7 +70,7 @@ public class InBoundHandler extends SimpleChannelInboundHandler<byte[]> {
                 AttributeKey<ModbusCMDGroupPackages> attributeKeyCmd = AttributeKey.valueOf("modbusCMDGroupPackagesDown");
                 ModbusCMDGroupPackages cmdGroupPackages= ctx.channel().attr(attributeKeyCmd).get();
                 if(cmdGroupPackages!=null){
-                    TCPServerNetty.getMessageMap().put((long)cmdGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress(), bytesTemp);
+                    TCPServerNetty.getMessageMap().put((long)cmdGroupPackages.getDmsProtocolPointModbusEntityList().get(0).getRegisterAddress()+123, bytesTemp);
                 }
 
                 AttributeKey<ModbusCMDGroupPackages> attributeKey2 = AttributeKey.valueOf("modbusCMDGroupPackages");
