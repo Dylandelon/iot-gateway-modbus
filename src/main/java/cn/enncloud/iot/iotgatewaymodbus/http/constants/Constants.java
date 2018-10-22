@@ -1,5 +1,7 @@
 package cn.enncloud.iot.iotgatewaymodbus.http.constants;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -34,6 +36,7 @@ public interface Constants {
 
     Lock lock = new ReentrantLock();
 //    Condition condition=lock.newCondition();
+    ScriptEngine JSE = new ScriptEngineManager().getEngineByName("JavaScript");
 
 
 }

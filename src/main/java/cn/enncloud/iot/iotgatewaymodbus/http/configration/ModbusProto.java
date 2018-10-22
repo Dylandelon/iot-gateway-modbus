@@ -1,14 +1,17 @@
 package cn.enncloud.iot.iotgatewaymodbus.http.configration;
 
 
+import cn.enncloud.iot.iotgatewaymodbus.http.constants.Constants;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DmsDeviceEntity;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.DmsProtocolPointModbusEntity;
 import cn.enncloud.iot.iotgatewaymodbus.http.service.dtos.ModbusCMDGroupPackages;
 import cn.enncloud.iot.iotgatewaymodbus.http.vo.dto.DmsGateWayDevicControlVo;
 import lombok.extern.log4j.Log4j;
 
+import javax.script.ScriptException;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -495,17 +498,9 @@ public class ModbusProto {
                         float value=convertModbusValue_RetFloat(info.getDmsPointName(),revdata,bufoffset,AlignType,DataFormat,registerLength);
                         String adjOffset=info.getAdjOffset();
                         if(adjOffset!=null) {
-                            if (adjOffset.contains("value*")) {
-                                String offsetstr = adjOffset.replace("value*", "").trim();
-                                float offset = 1;
-                                try {
-                                    offset = Float.parseFloat(offsetstr);
-                                } catch (Exception ex) {
-
-                                }
-                                if (offset != 0) {
-                                    value = value * offset;
-                                }
+                            if (adjOffset.contains("value")) {
+                                String offsetstr = adjOffset.replace("value", String.valueOf(value)).trim();
+                                value = computeExpression(offsetstr);
                             }
                         }
                         data.put(info.getDmsPointName(),value);
@@ -593,6 +588,28 @@ public class ModbusProto {
         datbytes[5]=(byte)msgPack.getValue();
         //datbytes=Tool.SC_Tea_Encryption(datbytes,secretKey.getBytes());
         return datbytes;
+    }
+    public static Float computeExpression(String ex){
+        Object ob =null;
+        try {
+            ob = Constants.JSE.eval(ex);
+            if(log.isInfoEnabled()){
+                log.info(ex+"表达式执行结果："+ob.toString());
+            }
+
+        } catch (ScriptException e) {
+            if(log.isErrorEnabled()){
+                log.error(ex+"表达式执行异常："+e.getMessage());
+            }
+
+        }
+        if(ob !=null){
+            BigDecimal value = new BigDecimal(ob.toString());
+            value = value.setScale(0, BigDecimal.ROUND_HALF_UP);
+            return value.floatValue();
+        }else{
+            return null;
+        }
     }
 
 
