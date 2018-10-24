@@ -18,7 +18,7 @@ spring:
       default-binder: kafka
       bindings:
         output:
-          destination: data_iot_HPS_uncim22
+          destination: data_iot_HPS_uncim
           content-type : application/json
           binder: kafka
           producer:
