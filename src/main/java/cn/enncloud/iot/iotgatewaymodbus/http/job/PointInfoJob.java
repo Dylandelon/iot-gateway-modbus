@@ -28,12 +28,14 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.util.AttributeKey;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.binding.BinderAwareChannelResolver;
 import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
 import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -62,6 +64,10 @@ public class PointInfoJob implements Runnable{
     private Environment environment;
     @Autowired
     private BinderAwareChannelResolver resolver;
+
+//    @Autowired
+//    @Qualifier(value = "source")
+//    private Source source;
 
 
 
@@ -179,7 +185,10 @@ public class PointInfoJob implements Runnable{
                                 }
                                 try {
                                     //发送数据到kafka
-                                    sendDataToKafka(dmsDeviceEntity.getSerialNum(), kafkaData);
+                                    boolean kafkaFlag = sendDataToKafka(dmsDeviceEntity.getSerialNum(), kafkaData);
+                                    if(!kafkaFlag){
+                                        log.error("发送kafka失败！");
+                                    }
                                     break;
                                 } catch (Exception ex) {
                                     ObjectMapper mapper = new ObjectMapper();
@@ -259,9 +268,9 @@ public class PointInfoJob implements Runnable{
     /**
      * 发送数据到kafka
      */
-    private void sendDataToKafka(String key, IotMessage kafkaData) throws Exception {
+    private boolean sendDataToKafka(String key, IotMessage kafkaData) throws Exception {
 
-        this.output.send(MessageBuilder.withPayload(kafkaData).build());
+        return this.output.send(MessageBuilder.withPayload(kafkaData).build());
     }
     void print_IReadUpInfo(DmsGatewayEntity deviceInfo,ReadUpInfo readUpInfo)
     {
