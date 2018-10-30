@@ -234,4 +234,59 @@ public static String asciiToString(String value)
 
 
     }
+    @Test
+    public void codet12(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("01060000");
+        sb.append(String.format("%04x", Integer.valueOf("1")));
+        byte[] bytesWriteMid = TCPServerNetty.hexToByteArray(sb.toString());
+        byte[] bytesWrite = CRC16.addCRC(bytesWriteMid);
+        System.out.println("1向设备下发的信息未加密为："+TCPServerNetty.bytesToHexString(bytesWrite));
+
+
+        byte[] datbytes=null;
+        datbytes=new byte[8];
+        datbytes[0]=(byte)1;
+        datbytes[1]=05;
+        datbytes[2]=(byte)(00);
+        datbytes[3]=(byte)00;
+        datbytes[4]=(byte)(Float.floatToIntBits(11.9f)>>24);
+        datbytes[5]=(byte)(Float.floatToIntBits(11.9f)>>16);
+        datbytes[6]=(byte)(Float.floatToIntBits(11.9f)>>8);
+        datbytes[7]=(byte)Float.floatToIntBits(11.9f);
+        byte[] bytesWrite2 = CRC16.addCRC(datbytes);
+        System.out.println("2向设备下发的信息未加密为："+TCPServerNetty.bytesToHexString(bytesWrite2));
+
+
+        byte[] datbytes99=new byte[4];
+
+        datbytes99[0]=(byte)(Float.floatToIntBits(11.9f)>>24);
+        datbytes99[1]=(byte)(Float.floatToIntBits(11.9f)>>16);
+        datbytes99[2]=(byte)(Float.floatToIntBits(11.9f)>>8);
+        datbytes99[3]=(byte)Float.floatToIntBits(11.9f);
+        System.out.println("datbytes99值"+getInt(datbytes99,0));
+
+        MsgPack msgPack = new MsgPack();
+        msgPack.setFunCode((byte)1);
+        msgPack.setDevAddress(1);
+        msgPack.setStartAddress(0);
+        msgPack.setValue(11.9f);
+        int a = Float.floatToIntBits(11.9f);
+        System.out.println(a+"float转化"+Integer.toBinaryString(a));
+        byte[] bytesWrite3 = CRC16.addCRC(ModbusProto.getCmdBytes(msgPack));
+        System.out.println("3向设备下发的信息未加密为："+TCPServerNetty.bytesToHexString(bytesWrite3));
+
+        System.out.println("比较是否相等："+ Arrays.equals(bytesWrite2,bytesWrite3));
+
+
+
+
+    }
+    public static int getInt(byte[] arr, int index) {
+        return (0xff000000 & (arr[index + 0] << 24)) |
+                (0x00ff0000 & (arr[index + 1] << 16)) |
+                (0x0000ff00 & (arr[index + 2] << 8)) |
+                (0x000000ff & arr[index + 3]);
+
+    }
 }

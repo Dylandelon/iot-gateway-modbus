@@ -14,5 +14,5 @@ public class MsgPack {
     private int devAddress;
     private int startAddress;
     private int registerNum;
-    private int value;
+    private float value;
 }

@@ -565,7 +565,7 @@ public class ModbusProto {
         msgPack.setDevAddress((byte)(int)deviceInfo.getSlaveAddress());
         msgPack.setStartAddress(info.getRegisterAddress());
 //        msgPack.registerNum=info.getRegisterLen();
-        msgPack.setValue(Integer.valueOf(entity.getValue()));
+        msgPack.setValue(Float.valueOf(entity.getValue()));
         msgPack.setFunCode((byte)info.getRegType());
         return msgPack;
     }
@@ -579,13 +579,16 @@ public class ModbusProto {
         }else{
             return datbytes;
         }
-        datbytes=new byte[6];
+        datbytes=new byte[8];
         datbytes[0]=(byte)msgPack.getDevAddress();
         datbytes[1]=msgPack.getFunCode();
         datbytes[2]=(byte)(msgPack.getStartAddress()>>8);
         datbytes[3]=(byte)msgPack.getStartAddress();
-        datbytes[4]=(byte)(msgPack.getValue()>>8);
-        datbytes[5]=(byte)msgPack.getValue();
+        datbytes[4]=(byte)(Float.floatToIntBits(msgPack.getValue())>>24);
+        datbytes[5]=(byte)(Float.floatToIntBits(msgPack.getValue())>>16);
+        datbytes[6]=(byte)(Float.floatToIntBits(msgPack.getValue())>>8);
+        datbytes[7]=(byte)Float.floatToIntBits(msgPack.getValue());
+
         //datbytes=Tool.SC_Tea_Encryption(datbytes,secretKey.getBytes());
         return datbytes;
     }
