@@ -190,7 +190,7 @@ public static String asciiToString(String value)
         msgPack.setFunCode((byte)6);
         msgPack.setDevAddress(1);
         msgPack.setStartAddress(0);
-        msgPack.setValue(1);
+        msgPack.setValue("1");
         ;
         byte[] bytesWrite3 = CRC16.addCRC(ModbusProto.getCmdBytes(msgPack));
         System.out.println("3向设备下发的信息未加密为："+TCPServerNetty.bytesToHexString(bytesWrite3));
@@ -223,7 +223,7 @@ public static String asciiToString(String value)
         msgPack.setFunCode((byte)6);
         msgPack.setDevAddress(1);
         msgPack.setStartAddress(0);
-        msgPack.setValue(1);
+        msgPack.setValue("1");
         ;
         byte[] bytesWrite3 = CRC16.addCRC(ModbusProto.getCmdBytes(msgPack));
         System.out.println("3向设备下发的信息未加密为："+TCPServerNetty.bytesToHexString(bytesWrite3));
@@ -270,7 +270,7 @@ public static String asciiToString(String value)
         msgPack.setFunCode((byte)1);
         msgPack.setDevAddress(1);
         msgPack.setStartAddress(0);
-        msgPack.setValue(11.9f);
+        msgPack.setValue("11.9");
         int a = Float.floatToIntBits(11.9f);
         System.out.println(a+"float转化"+Integer.toBinaryString(a));
         byte[] bytesWrite3 = CRC16.addCRC(ModbusProto.getCmdBytes(msgPack));

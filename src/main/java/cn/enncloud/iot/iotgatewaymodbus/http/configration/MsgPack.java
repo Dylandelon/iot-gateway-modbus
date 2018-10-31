@@ -14,5 +14,6 @@ public class MsgPack {
     private int devAddress;
     private int startAddress;
     private int registerNum;
-    private float value;
+    private String value;
+    private String dataFormat;
 }

@@ -416,11 +416,6 @@ public class ModbusProto {
             groupPackages.forEach(dmsProtocolPointModbusEntities -> {
 
                 msgPack.setStartAddress(dmsProtocolPointModbusEntities.get(0).getRegisterAddress());
-                int num = dmsProtocolPointModbusEntities.get(dmsProtocolPointModbusEntities.size() - 1).getRegisterAddress() - msgPack.getStartAddress() + dmsProtocolPointModbusEntities.get(dmsProtocolPointModbusEntities.size() - 1).getRegisterLen();
-                if(num <=24){
-
-                }
-
                 msgPack.setRegisterNum(dmsProtocolPointModbusEntities.get(dmsProtocolPointModbusEntities.size()-1).getRegisterAddress()-msgPack.getStartAddress()+dmsProtocolPointModbusEntities.get(dmsProtocolPointModbusEntities.size()-1).getRegisterLen());
                 ModbusCMDGroupPackages modbusCMDGroupPackages = new ModbusCMDGroupPackages();
                 modbusCMDGroupPackages.setMsgPack(msgPack);
@@ -565,8 +560,9 @@ public class ModbusProto {
         msgPack.setDevAddress((byte)(int)deviceInfo.getSlaveAddress());
         msgPack.setStartAddress(info.getRegisterAddress());
 //        msgPack.registerNum=info.getRegisterLen();
-        msgPack.setValue(Float.valueOf(entity.getValue()));
+        msgPack.setValue(entity.getValue());
         msgPack.setFunCode((byte)info.getRegType());
+        msgPack.setDataFormat(info.getDataFormat());
         return msgPack;
     }
     public static byte[] getCmdBytes(MsgPack msgPack) {
@@ -579,15 +575,43 @@ public class ModbusProto {
         }else{
             return datbytes;
         }
-        datbytes=new byte[8];
-        datbytes[0]=(byte)msgPack.getDevAddress();
-        datbytes[1]=msgPack.getFunCode();
-        datbytes[2]=(byte)(msgPack.getStartAddress()>>8);
-        datbytes[3]=(byte)msgPack.getStartAddress();
-        datbytes[4]=(byte)(Float.floatToIntBits(msgPack.getValue())>>24);
-        datbytes[5]=(byte)(Float.floatToIntBits(msgPack.getValue())>>16);
-        datbytes[6]=(byte)(Float.floatToIntBits(msgPack.getValue())>>8);
-        datbytes[7]=(byte)Float.floatToIntBits(msgPack.getValue());
+        if("FLOAT".equalsIgnoreCase(msgPack.getDataFormat())){
+            float value = Float.valueOf(msgPack.getValue());
+            datbytes=new byte[8];
+            datbytes[0]=(byte)msgPack.getDevAddress();
+            datbytes[1]=msgPack.getFunCode();
+            datbytes[2]=(byte)(msgPack.getStartAddress()>>8);
+            datbytes[3]=(byte)msgPack.getStartAddress();
+            datbytes[4]=(byte)(Float.floatToIntBits(value)>>24);
+            datbytes[5]=(byte)(Float.floatToIntBits(value)>>16);
+            datbytes[6]=(byte)(Float.floatToIntBits(value)>>8);
+            datbytes[7]=(byte)Float.floatToIntBits(value);
+        }else if("DOUBLE".equalsIgnoreCase(msgPack.getDataFormat())){
+            double value = Double.valueOf(msgPack.getValue());
+            datbytes=new byte[8];
+            datbytes[0]=(byte)msgPack.getDevAddress();
+            datbytes[1]=msgPack.getFunCode();
+            datbytes[2]=(byte)(msgPack.getStartAddress()>>8);
+            datbytes[3]=(byte)msgPack.getStartAddress();
+            datbytes[4]=(byte)(Double.doubleToLongBits(value)>>56);
+            datbytes[5]=(byte)(Double.doubleToLongBits(value)>>48);
+            datbytes[6]=(byte)(Double.doubleToLongBits(value)>>40);
+            datbytes[6]=(byte)(Double.doubleToLongBits(value)>>32);
+            datbytes[4]=(byte)(Double.doubleToLongBits(value)>>24);
+            datbytes[5]=(byte)(Double.doubleToLongBits(value)>>16);
+            datbytes[6]=(byte)(Double.doubleToLongBits(value)>>8);
+            datbytes[7]=(byte)Double.doubleToLongBits(value);
+        }else{
+            int value = Integer.valueOf(msgPack.getValue());
+            datbytes=new byte[6];
+            datbytes[0]=(byte)msgPack.getDevAddress();
+            datbytes[1]=msgPack.getFunCode();
+            datbytes[2]=(byte)(msgPack.getStartAddress()>>8);
+            datbytes[3]=(byte)msgPack.getStartAddress();
+            datbytes[4]=(byte)(value>>8);
+            datbytes[5]=(byte)value;
+        }
+
 
         //datbytes=Tool.SC_Tea_Encryption(datbytes,secretKey.getBytes());
         return datbytes;
